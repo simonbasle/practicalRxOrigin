@@ -12,25 +12,31 @@ import org.dogepool.practicalrx.services.RankingService;
 import org.dogepool.practicalrx.services.SearchService;
 import org.dogepool.practicalrx.services.StatService;
 import org.dogepool.practicalrx.services.UserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
+@SpringBootApplication
 public class Main {
 
     public static void main(String[] args) {
-        UserService userService = new UserService();
-        SearchService searchService = new SearchService();
-        StatService statService = new StatService();
-        PoolService poolService = new PoolService();
-        AdminService adminService = new AdminService();
-        RankingService rankingService = new RankingService();
-        HashrateService hashrateService = new HashrateService();
-        CoinService coinService = new CoinService();
-        ExchangeRateService exchangeRateService = new ExchangeRateService();
+        ApplicationContext ctx = SpringApplication.run(Main.class, args);
+
+        UserService userService = ctx.getBean(UserService.class);
+        SearchService searchService = ctx.getBean(SearchService.class);
+        AdminService adminService = ctx.getBean(AdminService.class);
+        StatService statService = ctx.getBean(StatService.class);
+        PoolService poolService = ctx.getBean(PoolService.class);
+        RankingService rankingService = ctx.getBean(RankingService.class);
+        HashrateService hashrateService = ctx.getBean(HashrateService.class);
+        CoinService coinService = ctx.getBean(CoinService.class);
+        ExchangeRateService exchangeRateService = ctx.getBean(ExchangeRateService.class);
 
         List<User> hashLadder = statService.getLadderByHashrate();
         List<User> coinsLadder = statService.getLadderByCoins();
 
         System.out.println("Welcome to " + poolService.poolName() + " dogecoin mining pool!");
-        System.out.println(poolService.miningUsers().size() + " users currently mining, for a global hashate of "
+        System.out.println(poolService.miningUsers().size() + " users currently mining, for a global hashrate of "
             + poolService.poolGigaHashrate() + " GHash/s");
 
         System.out.println("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("USD") + "$");

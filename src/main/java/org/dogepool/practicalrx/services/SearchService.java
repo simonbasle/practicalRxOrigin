@@ -4,10 +4,12 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dogepool.practicalrx.domain.User;
+import org.springframework.stereotype.Service;
 
 /**
  * A service to search for users by name, login and other criteria.
  */
+@Service
 public class SearchService {
 
     public List<User> findByName(String namePattern) {

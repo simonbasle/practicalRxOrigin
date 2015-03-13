@@ -1,10 +1,12 @@
 package org.dogepool.practicalrx.services;
 
 import org.dogepool.practicalrx.domain.User;
+import org.springframework.stereotype.Service;
 
 /**
  * Service to retrieve hashrate information of users.
  */
+@Service
 public class HashrateService {
 
     /**
@@ -12,6 +14,9 @@ public class HashrateService {
      * @return the last known gigahash/sec hashrate for the given user
      */
     public double hashrateFor(User user) {
-        return 0.1345;
+        if (user == User.USER) {
+            return 1.234;
+        }
+        return user.displayName.length() / 100d;
     }
 }

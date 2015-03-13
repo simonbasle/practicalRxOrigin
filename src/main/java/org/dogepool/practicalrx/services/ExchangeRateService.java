@@ -1,8 +1,11 @@
 package org.dogepool.practicalrx.services;
 
+import org.springframework.stereotype.Service;
+
 /**
  * A facade service to get DOGE to USD and DOGE to other currencies exchange rates.
  */
+@Service
 public class ExchangeRateService {
 
     public Double dogeToCurrencyExchangeRate(String targetCurrencyCode) {
@@ -21,6 +24,7 @@ public class ExchangeRateService {
     }
 
     private double dollarToCurrency(String currencyCode) {
+        //TODO call to external API
         if ("USD".equals(currencyCode)) {
             return 1.0;
         }

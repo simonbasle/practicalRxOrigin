@@ -4,11 +4,17 @@ import java.util.Collections;
 import java.util.List;
 
 import org.dogepool.practicalrx.domain.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * Service to retrieve information on the current status of the mining pool
  */
+@Service
 public class PoolService {
+
+    @Autowired
+    private HashrateService hashrateService;
 
     public String poolName() {
         return "Wow Such Pool!";
@@ -21,8 +27,8 @@ public class PoolService {
     public double poolGigaHashrate() {
         double hashrate = 0d;
         for (User u : miningUsers()) {
-            //TODO inject HashrateService and get user's "real" hashrate
-            hashrate += u.displayName.length();
+            double userRate = hashrateService.hashrateFor(u);
+            hashrate += userRate;
         }
         return hashrate;
     }
