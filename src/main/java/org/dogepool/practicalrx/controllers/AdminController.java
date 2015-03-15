@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/miner")
-public class MinerController {
+@RequestMapping("/admin")
+public class AdminController {
 
     @Autowired
     private UserService userService;
@@ -22,9 +22,9 @@ public class MinerController {
     @Autowired
     private PoolService poolService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
+    @RequestMapping(method = RequestMethod.POST, value = "/mining/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> connect(@PathVariable("id") long id) {
+    public ResponseEntity<String> registerMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id);
         if (user != null) {
             poolService.connectUser(user);
@@ -34,9 +34,9 @@ public class MinerController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
+    @RequestMapping(method = RequestMethod.DELETE, value = "mining/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> disconnect(@PathVariable("id") long id) {
+    public ResponseEntity<String> deregisterMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id);
         if (user != null) {
             poolService.disconnectUser(user);
