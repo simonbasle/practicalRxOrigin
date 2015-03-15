@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/miner")
+@RestController
+@RequestMapping("/miner")
 public class MinerController {
 
     @Autowired
@@ -21,12 +22,7 @@ public class MinerController {
     @Autowired
     private PoolService poolService;
 
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> index() {
-        return new ResponseEntity<String>("<html><body><h1>Hello<h1><p>please connect/disconnect</p>", HttpStatus.OK);
-    }
-
-    @RequestMapping(method = RequestMethod.POST, value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
+    @RequestMapping(method = RequestMethod.POST, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> connect(@PathVariable("id") long id) {
         User user = userService.getUser(id);
@@ -38,7 +34,7 @@ public class MinerController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
         consumes = MediaType.ALL_VALUE)
     public ResponseEntity<String> disconnect(@PathVariable("id") long id) {
         User user = userService.getUser(id);

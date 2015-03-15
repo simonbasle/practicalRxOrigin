@@ -32,6 +32,10 @@ public class Main {
         CoinService coinService = ctx.getBean(CoinService.class);
         ExchangeRateService exchangeRateService = ctx.getBean(ExchangeRateService.class);
 
+        //connect USER automatically
+        poolService.connectUser(User.USER);
+
+        //display welcome screen in console
         List<User> hashLadder = statService.getLadderByHashrate();
         List<User> coinsLadder = statService.getLadderByCoins();
 
