@@ -46,4 +46,9 @@ public class User {
         result = 31 * result + nickname.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return displayName + " (" + nickname + ")";
+    }
 }
