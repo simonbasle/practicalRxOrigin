@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping(value = "/admin", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AdminController {
 
     @Autowired
@@ -22,25 +22,23 @@ public class AdminController {
     @Autowired
     private PoolService poolService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/mining/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> registerMiningUser(@PathVariable("id") long id) {
+    @RequestMapping(method = RequestMethod.POST, value = "/mining/{id}", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<Object> registerMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id);
         if (user != null) {
             poolService.connectUser(user);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(poolService.miningUsers(), HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>("{\"error\": \"User not authenticated\"}", HttpStatus.NOT_FOUND);
         }
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, value = "mining/{id}", produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.ALL_VALUE)
-    public ResponseEntity<String> deregisterMiningUser(@PathVariable("id") long id) {
+    @RequestMapping(method = RequestMethod.DELETE, value = "mining/{id}", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<Object> deregisterMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id);
         if (user != null) {
             poolService.disconnectUser(user);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(poolService.miningUsers(), HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>("{\"error\": \"User not authenticated\"}", HttpStatus.NOT_FOUND);
         }
