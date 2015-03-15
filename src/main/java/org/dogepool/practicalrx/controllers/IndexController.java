@@ -2,7 +2,7 @@ package org.dogepool.practicalrx.controllers;
 
 import java.util.List;
 
-import org.dogepool.practicalrx.domain.User;
+import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.CoinService;
 import org.dogepool.practicalrx.services.ExchangeRateService;
 import org.dogepool.practicalrx.services.HashrateService;
@@ -28,21 +28,12 @@ public class IndexController {
     private PoolService poolService;
 
     @Autowired
-    private RankingService rankingService;
-
-    @Autowired
-    private HashrateService hashrateService;
-
-    @Autowired
-    private CoinService coinService;
-
-    @Autowired
     private ExchangeRateService exchangeRateService;
 
     @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
     public String index() {
-        List<User> hashLadder = statService.getLadderByHashrate();
-        List<User> coinsLadder = statService.getLadderByCoins();
+        List<UserStat> hashLadder = statService.getLadderByHashrate();
+        List<UserStat> coinsLadder = statService.getLadderByCoins();
 
         StringBuilder html = new StringBuilder("<html><body>");
 
@@ -55,18 +46,20 @@ public class IndexController {
         html.append("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("EUR") + "€</p>");
 
         html.append("<p><h3>----- TOP 10 Miners by Hashrate -----</h3>");
-        for (User user : hashLadder) {
-            html.append("<br/>").append(rankingService.rankByHashrate(user))
-                    .append(": ").append(user.nickname)
-                    .append(", ").append(hashrateService.hashrateFor(user)).append(" GHash/s");
+        int rank = 1;
+        for (UserStat userStat : hashLadder) {
+            html.append("<br/>").append(rank++)
+                    .append(": ").append(userStat.user.nickname)
+                    .append(", ").append(userStat.hashrate).append(" GHash/s");
         }
         html.append("</p>");
 
         html.append("<p><h3>----- TOP 10 Miners by Coins Found -----</h3>");
-        for (User user : coinsLadder) {
-            html.append("<br/>").append(rankingService.rankByCoins(user)).append(": ")
-                    .append(user.nickname).append(", ")
-                    .append(coinService.totalCoinsMinedBy(user)).append(" dogecoins");
+        rank = 1;
+        for (UserStat userStat : coinsLadder) {
+            html.append("<br/>").append(rank++).append(": ")
+                    .append(userStat.user.nickname).append(", ")
+                    .append(userStat.totalCoinsMined).append(" dogecoins");
         }
         html.append("</p>");
         html.append("</body></html>");

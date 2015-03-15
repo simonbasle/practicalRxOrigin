@@ -14,10 +14,10 @@ public class RankingService {
     private StatService statService;
 
     public int rankByHashrate(User user) {
-        return statService.rankByHashrate().indexOf(user) + 1;
+        return 1; //FIXME
     }
 
     public int rankByCoins(User user) {
-        return statService.rankByCoins().indexOf(user) + 1;
+        return 1; //FIXME
     }
 }

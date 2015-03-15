@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dogepool.practicalrx.domain.User;
+import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.StatService;
 import org.dogepool.practicalrx.services.UserService;
@@ -27,12 +28,12 @@ public class PoolController {
     private PoolService poolService;
 
     @RequestMapping("/ladder/hashrate")
-    public List<User> ladderByHashrate() {
+    public List<UserStat> ladderByHashrate() {
         return statService.getLadderByHashrate();
     }
 
     @RequestMapping("/ladder/coins")
-    public List<User> ladderByCoins() {
+    public List<UserStat> ladderByCoins() {
         return statService.getLadderByCoins();
     }
 

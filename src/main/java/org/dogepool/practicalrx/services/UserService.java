@@ -1,11 +1,8 @@
 package org.dogepool.practicalrx.services;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import javax.swing.text.html.Option;
 
 import org.dogepool.practicalrx.domain.User;
 import org.springframework.stereotype.Service;
