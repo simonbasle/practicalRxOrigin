@@ -6,7 +6,7 @@ import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.ExchangeRateService;
 import org.dogepool.practicalrx.services.PoolService;
-import org.dogepool.practicalrx.services.StatService;
+import org.dogepool.practicalrx.services.RankingService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +17,7 @@ public class Main {
     public static void main(String[] args) {
         ApplicationContext ctx = SpringApplication.run(Main.class, args);
 
-        StatService statService = ctx.getBean(StatService.class);
+        RankingService rankinService = ctx.getBean(RankingService.class);
         PoolService poolService = ctx.getBean(PoolService.class);
         ExchangeRateService exchangeRateService = ctx.getBean(ExchangeRateService.class);
 
@@ -25,8 +25,8 @@ public class Main {
         poolService.connectUser(User.USER);
 
         //display welcome screen in console
-        List<UserStat> hashLadder = statService.getLadderByHashrate();
-        List<UserStat> coinsLadder = statService.getLadderByCoins();
+        List<UserStat> hashLadder = rankinService.getLadderByHashrate();
+        List<UserStat> coinsLadder = rankinService.getLadderByCoins();
 
         System.out.println("Welcome to " + poolService.poolName() + " dogecoin mining pool!");
         System.out.println(poolService.miningUsers().size() + " users currently mining, for a global hashrate of "

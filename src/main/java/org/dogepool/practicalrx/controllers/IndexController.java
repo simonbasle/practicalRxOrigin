@@ -3,12 +3,9 @@ package org.dogepool.practicalrx.controllers;
 import java.util.List;
 
 import org.dogepool.practicalrx.domain.UserStat;
-import org.dogepool.practicalrx.services.CoinService;
 import org.dogepool.practicalrx.services.ExchangeRateService;
-import org.dogepool.practicalrx.services.HashrateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
-import org.dogepool.practicalrx.services.StatService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class IndexController {
 
     @Autowired
-    private StatService statService;
+    private RankingService rankService;
 
     @Autowired
     private PoolService poolService;
@@ -32,8 +29,8 @@ public class IndexController {
 
     @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
     public String index() {
-        List<UserStat> hashLadder = statService.getLadderByHashrate();
-        List<UserStat> coinsLadder = statService.getLadderByCoins();
+        List<UserStat> hashLadder = rankService.getLadderByHashrate();
+        List<UserStat> coinsLadder = rankService.getLadderByCoins();
 
         StringBuilder html = new StringBuilder("<html><body>");
 

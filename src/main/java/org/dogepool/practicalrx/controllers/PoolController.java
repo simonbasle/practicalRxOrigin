@@ -7,7 +7,7 @@ import java.util.Map;
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.PoolService;
-import org.dogepool.practicalrx.services.StatService;
+import org.dogepool.practicalrx.services.RankingService;
 import org.dogepool.practicalrx.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -22,19 +22,19 @@ public class PoolController {
     private UserService userService;
 
     @Autowired
-    private StatService statService;
+    private RankingService rankingService;
 
     @Autowired
     private PoolService poolService;
 
     @RequestMapping("/ladder/hashrate")
     public List<UserStat> ladderByHashrate() {
-        return statService.getLadderByHashrate();
+        return rankingService.getLadderByHashrate();
     }
 
     @RequestMapping("/ladder/coins")
     public List<UserStat> ladderByCoins() {
-        return statService.getLadderByCoins();
+        return rankingService.getLadderByCoins();
     }
 
     @RequestMapping("/hashrate")
