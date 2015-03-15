@@ -1,5 +1,8 @@
 package org.dogepool.practicalrx.controllers;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +11,7 @@ import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
+import org.dogepool.practicalrx.services.StatService;
 import org.dogepool.practicalrx.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,6 +30,9 @@ public class PoolController {
 
     @Autowired
     private PoolService poolService;
+
+    @Autowired
+    private StatService statService;
 
     @RequestMapping("/ladder/hashrate")
     public List<UserStat> ladderByHashrate() {
@@ -62,5 +69,18 @@ public class PoolController {
     @RequestMapping("/miners/active")
     public List<User> activeMiners() {
         return poolService.miningUsers();
+    }
+
+    @RequestMapping("/lastblock")
+    public Map<String, Object> lastBlock() {
+        LocalDateTime found = statService.lastBlockFoundDate();
+        Duration foundAgo = Duration.between(found, LocalDateTime.now());
+        User foundBy = statService.lastBlockFoundBy();
+
+        Map<String, Object> json = new HashMap<>(2);
+        json.put("foundOn", found.format(DateTimeFormatter.ISO_DATE_TIME));
+        json.put("foundAgo", foundAgo.toMinutes());
+        json.put("foundBy", foundBy);
+        return json;
     }
 }
