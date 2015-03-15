@@ -1,6 +1,12 @@
 package org.dogepool.practicalrx.controllers;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.dogepool.practicalrx.domain.User;
+import org.dogepool.practicalrx.services.AdminService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +27,9 @@ public class AdminController {
 
     @Autowired
     private PoolService poolService;
+
+    @Autowired
+    private AdminService adminService;
 
     @RequestMapping(method = RequestMethod.POST, value = "/mining/{id}", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<Object> registerMiningUser(@PathVariable("id") long id) {
@@ -44,4 +53,25 @@ public class AdminController {
         }
     }
 
+    @RequestMapping("/cost/{year}-{month}")
+    public Map<String, Object> cost(@PathVariable int year, @PathVariable int month) {
+        Month monthEnum = Month.of(month);
+        return cost(year, monthEnum);
+    }
+
+    @RequestMapping("/cost")
+    public Map<String, Object> cost() {
+        LocalDate now = LocalDate.now();
+        return cost(now.getYear(), now.getMonth());
+    }
+
+    @RequestMapping("/cost/{year}/{month}")
+    protected Map<String, Object> cost(@PathVariable int year, @PathVariable Month month) {
+        Map<String, Object> json = new HashMap<>();
+        json.put("month", month + " " + year);
+        json.put("cost", adminService.costForMonth(year, month));
+        json.put("currency", "USD");
+        json.put("currencySign", "$");
+        return json;
+    }
 }
