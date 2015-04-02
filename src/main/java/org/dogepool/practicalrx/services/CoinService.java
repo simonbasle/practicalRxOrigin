@@ -2,6 +2,7 @@ package org.dogepool.practicalrx.services;
 
 import org.dogepool.practicalrx.domain.User;
 import org.springframework.stereotype.Service;
+import rx.Observable;
 
 /**
  * Service for getting info on coins mined by users.
@@ -9,10 +10,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class CoinService {
 
-    public long totalCoinsMinedBy(User user) {
+    public Observable<Long> totalCoinsMinedBy(User user) {
         if (user == User.OTHERUSER) {
-            return 12L;
+            return Observable.just(12L);
         }
-        return 0L;
+        return Observable.just(0L);
     }
 }
