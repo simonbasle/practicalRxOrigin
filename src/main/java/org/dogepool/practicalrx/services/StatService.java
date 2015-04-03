@@ -9,6 +9,7 @@ import org.dogepool.practicalrx.domain.UserStat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * Service to get stats on the pool, like top 10 ladders for various criteria.
@@ -42,12 +43,12 @@ public class StatService {
     }
 
     public Observable<User> lastBlockFoundBy() {
-        Random rng = new Random(System.currentTimeMillis());
-        return userService.findAll()
-                   .toList()
-                   .map(allUsers -> {
-                       int index = rng.nextInt(allUsers.size());
-                       return allUsers.get(index);
-                   });
+        final Random rng = new Random(System.currentTimeMillis());
+        return Observable.just(rng.nextInt(10))
+                         .doOnNext(i -> System.out.println(i))
+                         .flatMap(i -> userService.findAll().skip(i))
+                         .last()
+                         .retry(4)
+                         .onErrorReturn(t -> new User(-1L, "Default", "Banned User", "default", "0"));
     }
 }
