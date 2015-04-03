@@ -41,7 +41,7 @@ public class UserProfileController {
 
     @RequestMapping("{id}")
     public ResponseEntity<UserProfile> profile(@PathVariable int id) {
-        User user = userService.getUser(id);
+        User user = userService.getUser(id).toBlocking().single();
         if (user == null) {
             return (ResponseEntity<UserProfile>) ResponseEntity.notFound();
         } else {
@@ -53,10 +53,10 @@ public class UserProfileController {
                 String smallAvatarUrl = (String) avatarInfo.get("small");
 
                 //complete with other information
-                double hash = hashrateService.hashrateFor(user);
-                long coins = coinService.totalCoinsMinedBy(user);
-                long rankByHash = rankingService.rankByHashrate(user);
-                long rankByCoins = rankingService.rankByCoins(user);
+                double hash = hashrateService.hashrateFor(user).toBlocking().single();
+                long coins = coinService.totalCoinsMinedBy(user).toBlocking().single();
+                long rankByHash = rankingService.rankByHashrate(user).toBlocking().single();
+                long rankByCoins = rankingService.rankByCoins(user).toBlocking().single();
 
                 //return the full profile
                 return ResponseEntity.ok(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins));

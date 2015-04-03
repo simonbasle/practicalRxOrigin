@@ -36,18 +36,18 @@ public class PoolController {
 
     @RequestMapping("/ladder/hashrate")
     public List<UserStat> ladderByHashrate() {
-        return rankingService.getLadderByHashrate();
+        return rankingService.getLadderByHashrate().toList().toBlocking().single();
     }
 
     @RequestMapping("/ladder/coins")
     public List<UserStat> ladderByCoins() {
-        return rankingService.getLadderByCoins();
+        return rankingService.getLadderByCoins().toList().toBlocking().single();
     }
 
     @RequestMapping("/hashrate")
     public Map<String, Object> globalHashRate() {
         Map<String, Object> json = new HashMap<>(2);
-        double ghashrate = poolService.poolGigaHashrate();
+        double ghashrate = poolService.poolGigaHashrate().toBlocking().single();
         if (ghashrate < 1) {
             json.put("unit", "MHash/s");
             json.put("hashrate", ghashrate * 100d);
@@ -61,21 +61,21 @@ public class PoolController {
     @RequestMapping("/miners")
     public Map<String, Object> miners() {
         Map<String, Object> json = new HashMap<>(2);
-        json.put("totalUsers", userService.findAll().size());
-        json.put("totalMiningUsers", poolService.miningUsers().size());
+        json.put("totalUsers", userService.findAll().count().toBlocking().single());
+        json.put("totalMiningUsers", poolService.miningUsers().count().toBlocking().single());
         return json;
     }
 
     @RequestMapping("/miners/active")
     public List<User> activeMiners() {
-        return poolService.miningUsers();
+        return poolService.miningUsers().toList().toBlocking().single();
     }
 
     @RequestMapping("/lastblock")
     public Map<String, Object> lastBlock() {
-        LocalDateTime found = statService.lastBlockFoundDate();
+        LocalDateTime found = statService.lastBlockFoundDate().toBlocking().single();
         Duration foundAgo = Duration.between(found, LocalDateTime.now());
-        User foundBy = statService.lastBlockFoundBy();
+        User foundBy = statService.lastBlockFoundBy().toBlocking().single();
 
         Map<String, Object> json = new HashMap<>(2);
         json.put("foundOn", found.format(DateTimeFormatter.ISO_DATE_TIME));

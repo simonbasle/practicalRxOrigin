@@ -29,14 +29,14 @@ public class IndexController {
 
     @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
     public String index() {
-        List<UserStat> hashLadder = rankService.getLadderByHashrate();
-        List<UserStat> coinsLadder = rankService.getLadderByCoins();
+        List<UserStat> hashLadder = rankService.getLadderByHashrate().toList().toBlocking().single();
+        List<UserStat> coinsLadder = rankService.getLadderByCoins().toList().toBlocking().single();
 
         StringBuilder html = new StringBuilder("<html><body>");
 
 
         html.append("<h1>Welcome to " + poolService.poolName() + " dogecoin mining pool</h1>");
-        html.append("<p>" + poolService.miningUsers().size() + " users currently mining, for a global hashrate of "
+        html.append("<p>" + poolService.miningUsers().count().toBlocking().single() + " users currently mining, for a global hashrate of "
                 + poolService.poolGigaHashrate() + " GHash/s</p>");
 
         html.append("<p>1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("USD") + "$<br/>");
