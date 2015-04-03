@@ -1,5 +1,7 @@
 package org.dogepool.practicalrx.domain;
 
+import com.couchbase.client.java.document.json.JsonObject;
+
 public class User {
 
     public static final User USER = new User(0L, "user0", "Test User", "Story of my life.\nEnd of Story.", "12434");
@@ -10,6 +12,7 @@ public class User {
     public final String displayName;
     public final String bio;
     public final String avatarId;
+    public final String type = "user";
 
     public User(long id, String nickname, String displayName, String bio, String avatarId) {
         this.id = id;
@@ -17,6 +20,22 @@ public class User {
         this.displayName = displayName;
         this.bio = bio;
         this.avatarId = avatarId;
+    }
+
+    public JsonObject toJsonObject(){
+        JsonObject jso = JsonObject.create();
+        jso.put("id",id);
+        jso.put("nickname",nickname);
+        jso.put("displayName", displayName);
+        jso.put("bio", bio);
+        jso.put("avatarId", avatarId);
+        jso.put("type", "user");
+        return jso;
+    }
+
+    public static User fromJsonObject(JsonObject jso){
+        return new User(jso.getInt("id"), jso.getString("nickname"), jso.getString("displayName"), jso.getString("bio"),
+                jso.getString("avatarId"));
     }
 
     @Override
