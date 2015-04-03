@@ -2,11 +2,14 @@ package org.dogepool.practicalrx;
 
 import java.util.List;
 
+import com.couchbase.client.java.Bucket;
+import com.couchbase.client.java.document.JsonDocument;
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.ExchangeRateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
+import org.dogepool.practicalrx.services.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -22,10 +25,16 @@ public class Main {
     }
 
     @Bean
-    CommandLineRunner commandLineRunner(RankingService rankinService, PoolService poolService, ExchangeRateService exchangeRateService) {
+    CommandLineRunner commandLineRunner(Bucket couchbaseBucket, UserService userService, RankingService rankinService, PoolService poolService, ExchangeRateService exchangeRateService) {
         return args -> {
+            JsonDocument u1 = JsonDocument.create(String.valueOf(User.USER.id), User.USER.toJsonObject());
+            JsonDocument u2 = JsonDocument.create(String.valueOf(User.OTHERUSER.id), User.OTHERUSER.toJsonObject());
+            couchbaseBucket.upsert(u1);
+            couchbaseBucket.upsert(u2);
+
+            User user = userService.getUser(0);
             //connect USER automatically
-            poolService.connectUser(User.USER);
+            poolService.connectUser(user);
 
             //display welcome screen in console
             List<UserStat> hashLadder = rankinService.getLadderByHashrate();
