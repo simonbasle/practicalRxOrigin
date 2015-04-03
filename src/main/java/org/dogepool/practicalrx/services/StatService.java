@@ -44,7 +44,10 @@ public class StatService {
 
     public Observable<User> lastBlockFoundBy() {
         final Random rng = new Random(System.currentTimeMillis());
-        return Observable.just(rng.nextInt(10))
+        return Observable.<Integer>create(s -> {
+            s.onNext(rng.nextInt(10));
+            s.onCompleted();
+        })
                          .doOnNext(i -> System.out.println(i))
                          .flatMap(i -> userService.findAll().skip(i))
                          .last()
