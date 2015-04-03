@@ -9,6 +9,8 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.query.*;
 import org.dogepool.practicalrx.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import static com.couchbase.client.java.query.dsl.Expression.*;
 
@@ -19,7 +21,10 @@ import static com.couchbase.client.java.query.dsl.Expression.*;
 public class UserService {
 
     @Autowired
-    Bucket couchbaseBucket;
+    private Bucket couchbaseBucket;
+
+    @Value("${store.enableFindAll:false}")
+    private boolean useCouchbaseForFindAll;
 
     public User getUser(long id) {
         for (User user : findAll()) {
@@ -42,13 +47,17 @@ public class UserService {
     }
 
     public List<User> findAll() {
-        Statement statement = Select.select("avatarId", "bio", "displayName", "id", "nickname").from(x("default"))
-                .where(x("type").eq(s("user"))).groupBy(x("displayName"));
-        QueryResult queryResult = couchbaseBucket.query(statement);
-        List<User> users = new ArrayList<User>();
-        for (QueryRow qr : queryResult ) {
-            users.add(User.fromJsonObject(qr.value()));
+        if (useCouchbaseForFindAll) {
+            Statement statement = Select.select("avatarId", "bio", "displayName", "id", "nickname").from(x("default"))
+                                        .where(x("type").eq(s("user"))).groupBy(x("displayName"));
+            QueryResult queryResult = couchbaseBucket.query(statement);
+            List<User> users = new ArrayList<User>();
+            for (QueryRow qr : queryResult) {
+                users.add(User.fromJsonObject(qr.value()));
+            }
+            return users;
+        } else {
+            return Arrays.asList(User.USER, User.OTHERUSER);
         }
-        return users;
     }
 }
