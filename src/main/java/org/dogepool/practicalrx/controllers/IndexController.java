@@ -37,7 +37,7 @@ public class IndexController {
 
         html.append("<h1>Welcome to " + poolService.poolName() + " dogecoin mining pool</h1>");
         html.append("<p>" + poolService.miningUsers().count().toBlocking().single() + " users currently mining, for a global hashrate of "
-                + poolService.poolGigaHashrate() + " GHash/s</p>");
+                + poolService.poolGigaHashrate().toBlocking().first() + " GHash/s</p>");
 
         html.append("<p>1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("USD") + "$<br/>");
         html.append("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("EUR") + "€</p>");

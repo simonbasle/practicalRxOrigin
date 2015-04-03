@@ -35,8 +35,8 @@ public class AdminController {
     public ResponseEntity<Object> registerMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id).toBlocking().firstOrDefault(null);
         if (user != null) {
-            poolService.connectUser(user);
-            return new ResponseEntity<>(poolService.miningUsers(), HttpStatus.ACCEPTED);
+            poolService.connectUser(user).toBlocking().first();
+            return new ResponseEntity<>(poolService.miningUsers().toList().toBlocking().first(), HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>("{\"error\": \"User not authenticated\"}", HttpStatus.NOT_FOUND);
         }
@@ -46,8 +46,8 @@ public class AdminController {
     public ResponseEntity<Object> deregisterMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id).toBlocking().firstOrDefault(null);
         if (user != null) {
-            poolService.disconnectUser(user);
-            return new ResponseEntity<>(poolService.miningUsers(), HttpStatus.ACCEPTED);
+            poolService.disconnectUser(user).toBlocking().first();
+            return new ResponseEntity<>(poolService.miningUsers().toList().toBlocking().first(), HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>("{\"error\": \"User not authenticated\"}", HttpStatus.NOT_FOUND);
         }

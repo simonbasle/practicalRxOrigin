@@ -53,7 +53,7 @@ public class PoolController {
             json.put("hashrate", ghashrate * 100d);
         } else {
             json.put("unit", "GHash/s");
-            json.put("hashrate", poolService.poolGigaHashrate());
+            json.put("hashrate", poolService.poolGigaHashrate().toBlocking().first());
         }
         return json;
     }

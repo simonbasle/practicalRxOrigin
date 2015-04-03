@@ -25,7 +25,8 @@ public class Main {
     }
 
     @Bean
-    CommandLineRunner commandLineRunner(Bucket couchbaseBucket, UserService userService, RankingService rankinService, PoolService poolService, ExchangeRateService exchangeRateService) {
+    CommandLineRunner commandLineRunner(Bucket couchbaseBucket, UserService userService, RankingService rankinService,
+            PoolService poolService, ExchangeRateService exchangeRateService) {
         return args -> {
             JsonDocument u1 = JsonDocument.create(String.valueOf(User.USER.id), User.USER.toJsonObject());
             JsonDocument u2 = JsonDocument.create(String.valueOf(User.OTHERUSER.id), User.OTHERUSER.toJsonObject());
@@ -43,7 +44,7 @@ public class Main {
 
             System.out.println("Welcome to " + poolService.poolName() + " dogecoin mining pool!");
             System.out.println(poolService.miningUsers().count().toBlocking().single() + " users currently mining, for a global hashrate of "
-                + poolService.poolGigaHashrate() + " GHash/s");
+                + poolService.poolGigaHashrate().toBlocking().first() + " GHash/s");
 
             System.out.println("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("USD") + "$");
             System.out.println("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("EUR") + "€");
