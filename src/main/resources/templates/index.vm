@@ -1,0 +1,22 @@
+<html>
+<body>
+<h1>Welcome to $model.poolName dogecoin mining pool</h1>
+<p>$model.miningUserCount users currently mining, for a global hashrate of $model.gigaHashrate GHash/s</p>
+<p>
+    $model.dogeToUsdMessage
+    <br/>$model.dogeToEurMessage
+</p>
+<p>
+<h3>----- TOP 10 Miners by Hashrate -----</h3><br/>
+#foreach( $userStat in $model.hashLadder() )
+    $velocityCount: ${userStat.user.nickname}, $userStat.hashrate GHash/s<br/>
+#end
+</p>
+<p>
+<h3>----- TOP 10 Miners by Coins Found -----</h3><br/>
+#foreach($userStat in $model.coinsLadder)
+    $velocityCount: $userStat.user.nickname: $userStat.totalCoinsMined dogecoins<br/>
+#end
+</p>
+</body>
+</html>
