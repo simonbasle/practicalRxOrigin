@@ -21,7 +21,6 @@ public class Main {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(Main.class, args);
-        ctx.close();
     }
 
     @Bean
