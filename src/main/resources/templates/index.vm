@@ -7,15 +7,15 @@
     <br/>$model.dogeToEurMessage
 </p>
 <p>
-<h3>----- TOP 10 Miners by Hashrate -----</h3><br/>
-#foreach( $userStat in $model.hashLadder() )
-    $velocityCount: ${userStat.user.nickname}, $userStat.hashrate GHash/s<br/>
+<h3>----- TOP 10 Miners by Hashrate -----</h3>
+#foreach( $userStat in $model.hashLadder )
+    $velocityCount: $userStat.user.nickname, $userStat.hashrate GHash/s<br/>
 #end
 </p>
 <p>
-<h3>----- TOP 10 Miners by Coins Found -----</h3><br/>
+<h3>----- TOP 10 Miners by Coins Found -----</h3>
 #foreach($userStat in $model.coinsLadder)
-    $velocityCount: $userStat.user.nickname: $userStat.totalCoinsMined dogecoins<br/>
+    $velocityCount: $userStat.user.nickname, $userStat.totalCoinsMined dogecoins<br/>
 #end
 </p>
 </body>
