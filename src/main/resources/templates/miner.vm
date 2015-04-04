@@ -1,0 +1,9 @@
+<html>
+<body>
+<img src='$minerModel.smallAvatarUrl' width=50 height=50/><h1>$minerModel.displayName</h1> - <i>$minerModel.nickname
+    <p>$minerModel.bio</p>
+    <br/><img src='$minerModel.avatarUrl'/>
+    <br/><h3>Rank by Coins: $minerModel.rankByCoins</h3>
+    <br/><h3>Rank by Hashrate: $minerModel.rankByHash</h3>
+</body>
+</html>
