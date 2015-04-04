@@ -54,7 +54,7 @@ public class SearchService {
         CountDownLatch latch = new CountDownLatch(userListSize);
         final List<UserStat> result = Collections.synchronizedList(new ArrayList<>(userListSize));
         for (User user : allUsers) {
-            coinService.totalCoinsMinedBy(user, new CoinServiceCallback<Long>() {
+            coinService.totalCoinsMinedBy(user, new ServiceCallback<Long>() {
                 @Override
                 public void onSuccess(Long coins) {
                     if (coins >= minCoins && (maxCoins < 0 || coins <= maxCoins)) {

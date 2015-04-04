@@ -36,7 +36,7 @@ public class StatService {
         final List<UserStat> result = Collections.synchronizedList(new ArrayList<>(userListSize));
         for (User user : allUsers) {
             double hashRateForUser = hashrateService.hashrateFor(user);
-            coinService.totalCoinsMinedBy(user, new CoinServiceCallback<Long>() {
+            coinService.totalCoinsMinedBy(user, new ServiceCallback<Long>() {
                 @Override
                 public void onSuccess(Long totalCoinsMinedByUser) {
                     UserStat userStat = new UserStat(user, hashRateForUser, totalCoinsMinedByUser);

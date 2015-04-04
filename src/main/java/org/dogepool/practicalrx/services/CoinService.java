@@ -13,7 +13,7 @@ public class CoinService {
     @Autowired
     UserService userService;
 
-    public void totalCoinsMinedBy(User user, CoinServiceCallback<Long> callback) {
+    public void totalCoinsMinedBy(User user, ServiceCallback<Long> callback) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -21,8 +21,9 @@ public class CoinService {
                 User otherUser = userService.getUser(1);
                 if (user == otherUser) {
                     coins = 12L;
+                } else {
+                    coins = 0L;
                 }
-                coins = 0L;
                 callback.onSuccess(coins);
             }
         });

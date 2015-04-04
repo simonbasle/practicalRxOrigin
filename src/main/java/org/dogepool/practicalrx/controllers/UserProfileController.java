@@ -1,8 +1,6 @@
 package org.dogepool.practicalrx.controllers;
 
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserProfile;
@@ -58,7 +56,7 @@ public class UserProfileController {
                 double hash = hashrateService.hashrateFor(user);
                 long rankByHash = rankingService.rankByHashrate(user);
                 long rankByCoins = rankingService.rankByCoins(user);
-                coinService.totalCoinsMinedBy(user, new CoinServiceCallback<Long>() {
+                coinService.totalCoinsMinedBy(user, new ServiceCallback<Long>() {
                     @Override
                     public void onSuccess(Long coins) {
                         ResponseEntity<UserProfile> response = ResponseEntity.ok(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins));

@@ -1,6 +1,6 @@
 package org.dogepool.practicalrx.services;
 
-public interface CoinServiceCallback<T> {
+public interface ServiceCallback<T> {
 
     void onSuccess(T value);
 
