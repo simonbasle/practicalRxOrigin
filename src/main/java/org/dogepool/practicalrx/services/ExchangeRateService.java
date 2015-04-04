@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import rx.Observable;
 
 /**
  * A facade service to get DOGE to USD and DOGE to other currencies exchange rates.
@@ -22,31 +23,37 @@ public class ExchangeRateService {
     @Autowired
     private RestTemplate restTemplate;
 
-    public Double dogeToCurrencyExchangeRate(String targetCurrencyCode) {
-        //get the doge-dollar rate
-        double doge2usd = dogeToDollar();
-
-        //get the dollar-currency rate
-        double usd2currency = dollarToCurrency(targetCurrencyCode);
-
-        //compute the result
-        return doge2usd * usd2currency;
+    public Observable<Double> dogeToCurrencyExchangeRate(String targetCurrencyCode) {
+        return dogeToDollar()
+                .zipWith(dollarToCurrency(targetCurrencyCode),
+                        (doge2usd, usd2currency) -> doge2usd * usd2currency);
     }
 
-    private double dogeToDollar() {
-        return restTemplate.getForObject(dogeUrl, Double.class);
+    private Observable<Double> dogeToDollar() {
+        return Observable.create(sub -> {
+            try {
+                Double rate = restTemplate.getForObject(dogeUrl, Double.class);
+                sub.onNext(rate);
+                sub.onCompleted();
+            } catch (Exception e) {
+                sub.onError(e);
+            }
+        });
     }
 
-    private double dollarToCurrency(String currencyCode) {
-        Map result = restTemplate.getForObject(exchangeUrl + "/{from}/{to}", Map.class,
-                "USD", currencyCode);
-        Double rate = (Double) result.get("exchangeRate");
-        if (rate == null)
-            rate = (Double) result.get("rate");
+    private Observable<Double> dollarToCurrency(String currencyCode) {
+        return Observable.<Double>create(sub -> {
+            Map result = restTemplate.getForObject(exchangeUrl + "/{from}/{to}", Map.class,
+                    "USD", currencyCode);
+            Double rate = (Double) result.get("exchangeRate");
+            if (rate == null)
+                rate = (Double) result.get("rate");
 
-        if (rate == null) {
-            throw new IllegalArgumentException("Malformed exchange rate");
-        }
-        return rate;
+            if (rate == null) {
+                sub.onError(new IllegalArgumentException("Malformed exchange rate"));
+            }
+            sub.onNext(rate);
+            sub.onCompleted();
+        });
     }
 }

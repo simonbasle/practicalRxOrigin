@@ -21,7 +21,7 @@ public class Main {
 
     public static void main(String[] args) {
         ConfigurableApplicationContext ctx = SpringApplication.run(Main.class, args);
-        ctx.close();
+//        ctx.close();
     }
 
     @Bean
@@ -46,16 +46,14 @@ public class Main {
             System.out.println(poolService.miningUsers().count().toBlocking().single() + " users currently mining, for a global hashrate of "
                 + poolService.poolGigaHashrate().toBlocking().first() + " GHash/s");
 
-            try {
-                System.out.println("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("USD") + "$");
-            } catch (Exception e) {
-                System.out.println("1 DOGE = ??$, couldn't get the exchange rate - " + e);
-            }
-            try {
-                System.out.println("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("EUR") + "€");
-            } catch (Exception e) {
-                System.out.println("1 DOGE = ??€, couldn't get the exchange rate - " + e);
-            }
+            exchangeRateService.dogeToCurrencyExchangeRate("USD").subscribe(
+                    r -> System.out.println("1 DOGE = " + r + "$"),
+                    e -> System.out.println("1 DOGE = ??$, couldn't get the exchange rate - " + e)
+            );
+            exchangeRateService.dogeToCurrencyExchangeRate("EUR").subscribe(
+                    r -> System.out.println("1 DOGE = " + r + "€"),
+                    e -> System.out.println("1 DOGE = ??€, couldn't get the exchange rate - " + e)
+            );
 
             System.out.println("\n----- TOP 10 Miners by Hashrate -----");
             int count = 1;

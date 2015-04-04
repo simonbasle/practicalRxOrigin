@@ -39,8 +39,16 @@ public class IndexController {
         html.append("<p>" + poolService.miningUsers().count().toBlocking().single() + " users currently mining, for a global hashrate of "
                 + poolService.poolGigaHashrate().toBlocking().first() + " GHash/s</p>");
 
-        html.append("<p>1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("USD") + "$<br/>");
-        html.append("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("EUR") + "€</p>");
+        exchangeRateService.dogeToCurrencyExchangeRate("USD")
+                .doOnNext(r -> html.append("<p>1 DOGE = ").append(r).append("$<br/>"))
+                .doOnError(e -> html.append("<p>1 DOGE = ??$, couldn't get the exchange rate - ").append(e).append("</br>"))
+                .onErrorReturn(null)
+                .toBlocking().last();
+        exchangeRateService.dogeToCurrencyExchangeRate("EUR")
+                .doOnNext(r -> html.append("1 DOGE = ").append(r).append("€</p>"))
+                .doOnError(e -> html.append("1 DOGE = ??€, couldn't get the exchange rate - ").append(e).append("</p>"))
+                .onErrorReturn(null)
+                .toBlocking().last();
 
         html.append("<p><h3>----- TOP 10 Miners by Hashrate -----</h3>");
         int rank = 1;
