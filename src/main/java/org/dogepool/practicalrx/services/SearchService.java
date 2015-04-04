@@ -1,7 +1,10 @@
 package org.dogepool.practicalrx.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
@@ -45,12 +48,27 @@ public class SearchService {
      * @return the list of matching users.
      */
     public List<UserStat> findByCoins(long minCoins, long maxCoins) {
-        List<UserStat> result = new ArrayList<>();
-        for (User u : userService.findAll()) {
-            long coins = coinService.totalCoinsMinedBy(u);
-            if (coins >= minCoins && (maxCoins < 0 || coins <= maxCoins)) {
-                result.add(new UserStat(u, -1d, coins));
-            }
+
+        List<User> allUsers = userService.findAll();
+        int userListSize = allUsers.size();
+        CountDownLatch latch = new CountDownLatch(userListSize);
+        final List<UserStat> result = Collections.synchronizedList(new ArrayList<>(userListSize));
+        for (User user : allUsers) {
+            coinService.totalCoinsMinedBy(user, new CoinServiceCallback<Long>() {
+                @Override
+                public void onSuccess(Long coins) {
+                    if (coins >= minCoins && (maxCoins < 0 || coins <= maxCoins)) {
+                        result.add(new UserStat(user, -1d, coins));
+                    }
+                    latch.countDown();
+                }
+            });
+
+        }
+        try {
+            latch.await(10, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         return result;
     }

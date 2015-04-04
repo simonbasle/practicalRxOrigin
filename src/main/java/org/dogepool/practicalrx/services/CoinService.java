@@ -1,6 +1,5 @@
 package org.dogepool.practicalrx.services;
 
-import com.couchbase.client.java.Bucket;
 import org.dogepool.practicalrx.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +13,19 @@ public class CoinService {
     @Autowired
     UserService userService;
 
-    public long totalCoinsMinedBy(User user) {
-        User otherUser = userService.getUser(1);
-        if (user == otherUser) {
-            return 12L;
-        }
-        return 0L;
+    public void totalCoinsMinedBy(User user, CoinServiceCallback<Long> callback) {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Long coins;
+                User otherUser = userService.getUser(1);
+                if (user == otherUser) {
+                    coins = 12L;
+                }
+                coins = 0L;
+                callback.onSuccess(coins);
+            }
+        });
+        t.start();
     }
 }

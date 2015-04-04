@@ -1,11 +1,13 @@
 package org.dogepool.practicalrx.services;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
@@ -29,9 +31,25 @@ public class StatService {
 
     public List<UserStat> getAllStats() {
         List<User> allUsers = userService.findAll();
-        List<UserStat> result = new ArrayList<>(allUsers.size());
+        int userListSize = allUsers.size();
+        CountDownLatch latch = new CountDownLatch(userListSize);
+        final List<UserStat> result = Collections.synchronizedList(new ArrayList<>(userListSize));
         for (User user : allUsers) {
-            result.add(new UserStat(user, hashrateService.hashrateFor(user), coinService.totalCoinsMinedBy(user)));
+            double hashRateForUser = hashrateService.hashrateFor(user);
+            coinService.totalCoinsMinedBy(user, new CoinServiceCallback<Long>() {
+                @Override
+                public void onSuccess(Long totalCoinsMinedByUser) {
+                    UserStat userStat = new UserStat(user, hashRateForUser, totalCoinsMinedByUser);
+                    result.add(userStat);
+                    latch.countDown();
+                }
+            });
+
+        }
+        try {
+            latch.await(10,TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
         return result;
     }
