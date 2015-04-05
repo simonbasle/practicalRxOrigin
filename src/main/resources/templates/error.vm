@@ -1,0 +1,7 @@
+<html>
+<body>
+<p>Something went wrong: ${status} ${error}</p>
+
+<img src='/images/dogeError.jpg'/>
+</body>
+</html>
