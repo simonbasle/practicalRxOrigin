@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dogepool.practicalrx.domain.User;
+import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.Error;
 import org.dogepool.practicalrx.services.AdminService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.UserService;
@@ -38,7 +40,7 @@ public class AdminController {
             poolService.connectUser(user).toBlocking().first();
             return new ResponseEntity<>(poolService.miningUsers().toList().toBlocking().first(), HttpStatus.ACCEPTED);
         } else {
-            return new ResponseEntity<>("{\"error\": \"User not authenticated\"}", HttpStatus.NOT_FOUND);
+            throw new DogePoolException("User cannot mine, not authenticated", Error.BAD_USER, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -49,7 +51,7 @@ public class AdminController {
             poolService.disconnectUser(user).toBlocking().first();
             return new ResponseEntity<>(poolService.miningUsers().toList().toBlocking().first(), HttpStatus.ACCEPTED);
         } else {
-            return new ResponseEntity<>("{\"error\": \"User not authenticated\"}", HttpStatus.NOT_FOUND);
+            throw new DogePoolException("User is not mining, not authenticated", Error.BAD_USER, HttpStatus.NOT_FOUND);
         }
     }
 

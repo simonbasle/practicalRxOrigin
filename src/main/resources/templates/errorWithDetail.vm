@@ -8,7 +8,13 @@
 </head>
 <body>
 <h1>Something went wrong:</h1>
-<p>${status} ${error} -</p>
+<p>$msg</p>
 <p><img src='/images/dogeError.jpg'/></p>
+Much Details!
+<ul>
+    <li>Error Code: <b>$errorCode</b></li>
+    <li>Error Category: <b>$errorCategory</b></li>
+    <li>Http Status: <b>$httpStatus</b></li>
+</ul>
 </body>
 </html>
