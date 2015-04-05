@@ -6,7 +6,10 @@ import java.util.List;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
+import org.dogepool.practicalrx.error.DogePoolException;
+import org.dogepool.practicalrx.error.Error;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -20,7 +23,7 @@ public class RankingService {
 
     /**
      * Find the user's rank by hashrate in the pool. This is a costly operation.
-     * @return the rank of the user in terms of hashrate, or -1 if it couldnt' be established.
+     * @return the rank of the user in terms of hashrate, or throw a {@link DogePoolException} if it couldnt' be established.
      */
     public int rankByHashrate(User user) {
         List<UserStat> rankedByHashrate = rankByHashrate();
@@ -31,12 +34,12 @@ public class RankingService {
             }
             rank++;
         }
-        return -1;
+        throw new DogePoolException("Cannot rank " + user.nickname + " by hashrate", Error.RANK_HASH, HttpStatus.NO_CONTENT);
     }
 
     /**
      * Find the user's rank by number of coins found. This is a costly operation.
-     * @return the rank of the user in terms of coins found, or -1 if it couldn't be established.
+     * @return the rank of the user in terms of coins found, or throw a {@link DogePoolException} if it cannot be established.
      */
     public int rankByCoins(User user) {
         List<UserStat> rankedByCoins = rankByCoins();
@@ -47,7 +50,7 @@ public class RankingService {
             }
             rank++;
         }
-        return -1;
+        throw new DogePoolException("Cannot rank " + user.nickname + " by coins mined", Error.RANK_COIN, HttpStatus.NO_CONTENT);
     }
 
     public List<UserStat> getLadderByHashrate() {

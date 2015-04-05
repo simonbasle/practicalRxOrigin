@@ -11,7 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
+import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.Error;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,7 +52,7 @@ public class StatService {
         try {
             latch.await(10,TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new DogePoolException("Timeout when getting coin stats", Error.RANK_COIN, HttpStatus.REQUEST_TIMEOUT, e);
         }
         return result;
     }

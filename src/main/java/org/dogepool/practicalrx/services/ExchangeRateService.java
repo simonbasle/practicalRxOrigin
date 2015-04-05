@@ -2,9 +2,13 @@ package org.dogepool.practicalrx.services;
 
 import java.util.Map;
 
+import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -34,19 +38,29 @@ public class ExchangeRateService {
     }
 
     private double dogeToDollar() {
-        return restTemplate.getForObject(dogeUrl, Double.class);
+        try {
+            return restTemplate.getForObject(dogeUrl, Double.class);
+        } catch (RestClientException e) {
+            throw new DogePoolException("Unable to reach doge rate service at " + dogeUrl,
+                    Error.UNREACHABLE_SERVICE, HttpStatus.REQUEST_TIMEOUT);
+        }
     }
 
     private double dollarToCurrency(String currencyCode) {
-        Map result = restTemplate.getForObject(exchangeUrl + "/{from}/{to}", Map.class,
-                "USD", currencyCode);
-        Double rate = (Double) result.get("exchangeRate");
-        if (rate == null)
-            rate = (Double) result.get("rate");
+        try {
+            Map result = restTemplate.getForObject(exchangeUrl + "/{from}/{to}", Map.class,
+                    "USD", currencyCode);
+            Double rate = (Double) result.get("exchangeRate");
+            if (rate == null)
+                rate = (Double) result.get("rate");
 
-        if (rate == null) {
-            throw new IllegalArgumentException("Malformed exchange rate");
+            if (rate == null) {
+                throw new DogePoolException("Malformed exchange rate", Error.BAD_CURRENCY, HttpStatus.UNPROCESSABLE_ENTITY);
+            }
+            return rate;
+        } catch (RestClientException e) {
+            throw new DogePoolException("Unable to reach currency exchange service at " + exchangeUrl,
+                    Error.UNREACHABLE_SERVICE, HttpStatus.REQUEST_TIMEOUT);
         }
-        return rate;
     }
 }

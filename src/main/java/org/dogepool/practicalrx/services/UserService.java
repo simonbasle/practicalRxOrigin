@@ -1,18 +1,24 @@
 package org.dogepool.practicalrx.services;
 
+import static com.couchbase.client.java.query.dsl.Expression.s;
+import static com.couchbase.client.java.query.dsl.Expression.x;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.query.*;
+import com.couchbase.client.java.query.QueryResult;
+import com.couchbase.client.java.query.QueryRow;
+import com.couchbase.client.java.query.Select;
+import com.couchbase.client.java.query.Statement;
 import org.dogepool.practicalrx.domain.User;
+import org.dogepool.practicalrx.error.DogePoolException;
+import org.dogepool.practicalrx.error.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import static com.couchbase.client.java.query.dsl.Expression.*;
 
 /**
  * Service to get user information.
@@ -48,14 +54,19 @@ public class UserService {
 
     public List<User> findAll() {
         if (useCouchbaseForFindAll) {
-            Statement statement = Select.select("avatarId", "bio", "displayName", "id", "nickname").from(x("default"))
-                                        .where(x("type").eq(s("user"))).groupBy(x("displayName"));
-            QueryResult queryResult = couchbaseBucket.query(statement);
-            List<User> users = new ArrayList<User>();
-            for (QueryRow qr : queryResult) {
-                users.add(User.fromJsonObject(qr.value()));
+            try {
+                Statement statement = Select.select("avatarId", "bio", "displayName", "id", "nickname").from(x("default"))
+                                            .where(x("type").eq(s("user"))).groupBy(x("displayName"));
+                QueryResult queryResult = couchbaseBucket.query(statement);
+                List<User> users = new ArrayList<User>();
+                for (QueryRow qr : queryResult) {
+                    users.add(User.fromJsonObject(qr.value()));
+                }
+                return users;
+            } catch (Exception e) {
+                throw new DogePoolException("Error while getting list of users from database",
+                        Error.DATABASE, HttpStatus.INTERNAL_SERVER_ERROR, e);
             }
-            return users;
         } else {
             return Arrays.asList(User.USER, User.OTHERUSER);
         }

@@ -4,16 +4,18 @@ import java.util.Map;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserProfile;
+import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.Error;
 import org.dogepool.practicalrx.services.*;
 import org.dogepool.practicalrx.views.models.MinerModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -39,11 +41,11 @@ public class UserProfileController {
     private RestTemplate restTemplate;
 
     @RequestMapping(value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public DeferredResult<ResponseEntity<UserProfile>> profile(@PathVariable int id) {
-        DeferredResult<ResponseEntity<UserProfile>> deferred = new DeferredResult<>(90000);
+    public DeferredResult<UserProfile> profile(@PathVariable int id) {
+        DeferredResult<UserProfile> deferred = new DeferredResult<>(90000);
         User user = userService.getUser(id);
         if (user == null) {
-            deferred.setErrorResult(ResponseEntity.notFound());
+            deferred.setErrorResult(new DogePoolException("Unknown miner", Error.UNKNOWN_USER, HttpStatus.NOT_FOUND));
             return deferred;
         } else {
             //find the avatar's url
@@ -60,14 +62,15 @@ public class UserProfileController {
                 coinService.totalCoinsMinedBy(user, new ServiceCallback<Long>() {
                     @Override
                     public void onSuccess(Long coins) {
-                        ResponseEntity<UserProfile> response = ResponseEntity.ok(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins));
-                        deferred.setResult(response);
+                        deferred.setResult(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl,
+                                rankByHash, rankByCoins));
                     }
                 });
 
                 return deferred;
             } else {
-                deferred.setErrorResult(new ResponseEntity<UserProfile>(avatarResponse.getStatusCode()));
+                deferred.setErrorResult(new DogePoolException("Unable to get avatar info", Error.UNREACHABLE_SERVICE,
+                        avatarResponse.getStatusCode()));
                 return deferred;
             }
         }
@@ -78,7 +81,7 @@ public class UserProfileController {
         DeferredResult<String> stringResponse = new DeferredResult<>(90000);
         User user = userService.getUser(id);
         if (user == null) {
-            stringResponse.setErrorResult(ResponseEntity.notFound());
+            stringResponse.setErrorResult(new DogePoolException("Unknown miner", Error.UNKNOWN_USER, HttpStatus.NOT_FOUND));
             return stringResponse;
         } else {
             //find the avatar's url
@@ -112,7 +115,8 @@ public class UserProfileController {
 
                 return stringResponse;
             } else {
-                stringResponse.setErrorResult(new ResponseEntity<UserProfile>(avatarResponse.getStatusCode()));
+                stringResponse.setErrorResult(new DogePoolException("Unable to get avatar info", Error.UNREACHABLE_SERVICE,
+                        avatarResponse.getStatusCode()));
                 return stringResponse;
             }
         }
