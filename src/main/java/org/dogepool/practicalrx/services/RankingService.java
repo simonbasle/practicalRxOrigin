@@ -26,7 +26,7 @@ public class RankingService {
         List<UserStat> rankedByHashrate = rankByHashrate();
         int rank = 1;
         for (UserStat stat : rankedByHashrate) {
-            if (stat.user == user) {
+            if (stat.user.equals(user)) {
                 return rank;
             }
             rank++;
@@ -42,7 +42,7 @@ public class RankingService {
         List<UserStat> rankedByCoins = rankByCoins();
         int rank = 1;
         for (UserStat stat : rankedByCoins) {
-            if (stat.user == user) {
+            if (stat.user.equals(user)) {
                 return rank;
             }
             rank++;

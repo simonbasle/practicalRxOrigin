@@ -19,7 +19,7 @@ public class CoinService {
             public void run() {
                 Long coins;
                 User otherUser = userService.getUser(1);
-                if (user == otherUser) {
+                if (user.equals(otherUser)) {
                     coins = 12L;
                 } else {
                     coins = 0L;

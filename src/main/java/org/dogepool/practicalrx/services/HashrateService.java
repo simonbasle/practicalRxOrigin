@@ -19,7 +19,7 @@ public class HashrateService {
      */
     public double hashrateFor(User user) {
         User otherUser = userService.getUser(0);
-        if (user == otherUser) {
+        if (user.equals(otherUser)) {
             return 1.234;
         }
         return user.displayName.length() / 100d;
