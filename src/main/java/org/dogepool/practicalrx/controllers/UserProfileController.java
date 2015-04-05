@@ -4,21 +4,20 @@ import java.util.Map;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserProfile;
-import org.dogepool.practicalrx.services.CoinService;
-import org.dogepool.practicalrx.services.HashrateService;
-import org.dogepool.practicalrx.services.RankingService;
-import org.dogepool.practicalrx.services.UserService;
+import org.dogepool.practicalrx.services.*;
+import org.dogepool.practicalrx.views.models.MinerModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.async.DeferredResult;
 
-@RestController
-@RequestMapping(value = "/miner", produces = MediaType.APPLICATION_JSON_VALUE)
+@Controller(value = "/miner")
 public class UserProfileController {
     
     @Value(value = "${avatar.api.baseUrl}")
@@ -39,11 +38,13 @@ public class UserProfileController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @RequestMapping("{id}")
-    public ResponseEntity<UserProfile> profile(@PathVariable int id) {
+    @RequestMapping(value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public DeferredResult<ResponseEntity<UserProfile>> profile(@PathVariable int id) {
+        DeferredResult<ResponseEntity<UserProfile>> deferred = new DeferredResult<>(90000);
         User user = userService.getUser(id).toBlocking().single();
         if (user == null) {
-            return (ResponseEntity<UserProfile>) ResponseEntity.notFound();
+            deferred.setErrorResult(ResponseEntity.notFound());
+            return deferred;
         } else {
             //find the avatar's url
             ResponseEntity<Map> avatarResponse = restTemplate.getForEntity(avatarBaseUrl + "/" + user.avatarId, Map.class);
@@ -59,34 +60,54 @@ public class UserProfileController {
                 long rankByCoins = rankingService.rankByCoins(user).toBlocking().single();
 
                 //return the full profile
-                return ResponseEntity.ok(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins));
+                ResponseEntity<UserProfile> response = ResponseEntity.ok(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins));
+                deferred.setResult(response);
+                return deferred;
             } else {
-                return new ResponseEntity<UserProfile>(avatarResponse.getStatusCode());
+                deferred.setErrorResult(new ResponseEntity<UserProfile>(avatarResponse.getStatusCode()));
+                return deferred;
             }
         }
     }
 
-    @RequestMapping(value = "{id}", produces = MediaType.TEXT_HTML_VALUE)
-    public ResponseEntity<String> profileHtml(@PathVariable int id) {
-        ResponseEntity<UserProfile> responseProfile = profile(id);
-        if (responseProfile.getStatusCode().is2xxSuccessful()) {
-            UserProfile profile = responseProfile.getBody();
-            User user = profile.user;
-            //A template would probably be better but this is poor man's html version
-            StringBuilder sb = new StringBuilder("<html><body>");
-            sb.append("\n<img src='").append(profile.smallAvatarUrl).append("' width=50 height=50/>");
-            sb.append("<h1>").append(user.displayName).append("</h1> - <i>").append(user.nickname);
-            sb.append("\n<p>").append(user.bio).append("</p>");
-            sb.append("\n<br/><img src='").append(profile.avatarUrl).append("'/>");
-            sb.append("\n<br/><h3>Rank by Coins: ").append(profile.rankByCoins).append("</h3>");
-            sb.append("\n<br/><h3>Rank by Hashrate: ").append(profile.rankByHash).append("</h3>");
-            sb.append("\n</body></html>");
-            return ResponseEntity.ok(sb.toString());
+    @RequestMapping(value = "/miner/{id}", produces = MediaType.TEXT_HTML_VALUE)
+    public DeferredResult<String> miner(Map<String, Object> model, @PathVariable int id) {
+        DeferredResult<String> stringResponse = new DeferredResult<>(90000);
+        User user = userService.getUser(id).toBlocking().firstOrDefault(null);
+        if (user == null) {
+            stringResponse.setErrorResult(ResponseEntity.notFound());
+            return stringResponse;
         } else {
-            return new ResponseEntity<String>(responseProfile.getBody().toString(), responseProfile.getHeaders(),
-                    responseProfile.getStatusCode());
+            //find the avatar's url
+            ResponseEntity<Map> avatarResponse = restTemplate.getForEntity(avatarBaseUrl + "/" + user.avatarId, Map.class);
+            if (avatarResponse.getStatusCode().is2xxSuccessful()) {
+                Map<String, ?> avatarInfo = avatarResponse.getBody();
+                String avatarUrl = (String) avatarInfo.get("large");
+                String smallAvatarUrl = (String) avatarInfo.get("small");
+
+                //complete with other information
+                double hash = hashrateService.hashrateFor(user).toBlocking().single();
+                long rankByHash = rankingService.rankByHashrate(user).toBlocking().single();
+                long rankByCoins = rankingService.rankByCoins(user).toBlocking().single();
+                long coins = coinService.totalCoinsMinedBy(user).toBlocking().single();
+
+                UserProfile profile = new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins);
+                        MinerModel minerModel = new MinerModel();
+                minerModel.setAvatarUrl(profile.avatarUrl);
+                minerModel.setSmallAvatarUrl(profile.smallAvatarUrl);
+                minerModel.setBio(user.bio);
+                minerModel.setDisplayName(user.displayName);
+                minerModel.setNickname(user.nickname);
+                minerModel.setRankByCoins(profile.rankByCoins);
+                minerModel.setRankByHash(profile.rankByHash);
+                model.put("minerModel", minerModel);
+                stringResponse.setResult("miner");
+
+                return stringResponse;
+            } else {
+                stringResponse.setErrorResult(new ResponseEntity<UserProfile>(avatarResponse.getStatusCode()));
+                return stringResponse;
+            }
         }
-
-
-    }
+}
 }

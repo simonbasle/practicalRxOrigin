@@ -1,21 +1,22 @@
 package org.dogepool.practicalrx.controllers;
 
-import java.util.List;
+import java.util.Map;
 
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.ExchangeRateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
+import org.dogepool.practicalrx.views.models.IndexModel;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import rx.Observable;
 
 /**
  * A utility controller that displays the welcome message as HTML on root endpoint.
  */
-@RestController
-@RequestMapping("/")
+@Controller
 public class IndexController {
 
     @Autowired
@@ -27,47 +28,37 @@ public class IndexController {
     @Autowired
     private ExchangeRateService exchangeRateService;
 
-    @RequestMapping(produces = MediaType.TEXT_HTML_VALUE)
-    public String index() {
-        List<UserStat> hashLadder = rankService.getLadderByHashrate().toList().toBlocking().single();
-        List<UserStat> coinsLadder = rankService.getLadderByCoins().toList().toBlocking().single();
+    @RequestMapping("/")
+    public String index(Map<String, Object> model) {
+        //prepare the error catching observable for currency rates
+        Observable<String> doge2usd = exchangeRateService.dogeToCurrencyExchangeRate("USD")
+                .map(rate -> "1 DOGE = " + rate + "$")
+                .onErrorReturn(e -> "1 DOGE = ??$, couldn't get the exchange rate - " + e);
+        Observable<String> doge2eur = exchangeRateService.dogeToCurrencyExchangeRate("EUR")
+                 .map(rate -> "1 DOGE = " + rate + "€")
+                 .onErrorReturn(e -> "1 DOGE = ??€, couldn't get the exchange rate - " + e);
+        //prepare a model
+        Observable<IndexModel> modelZip = Observable.zip(
+                rankService.getLadderByHashrate().toList(),
+                rankService.getLadderByCoins().toList(),
+                poolService.miningUsers().count(),
+                poolService.poolGigaHashrate(),
+                doge2usd,
+                doge2eur,
+                (lh, lc, muc, pgr, d2u, d2e) -> {
+                    IndexModel idxModel = new IndexModel();
+                    idxModel.setPoolName(poolService.poolName());
+                    idxModel.setHashLadder(lh);
+                    idxModel.setCoinsLadder(lc);
+                    idxModel.setMiningUserCount(muc);
+                    idxModel.setGigaHashrate(pgr);
+                    idxModel.setDogeToUsdMessage(d2u);
+                    idxModel.setDogeToEurMessage(d2e);
+                    return idxModel;
+                });
 
-        StringBuilder html = new StringBuilder("<html><body>");
-
-
-        html.append("<h1>Welcome to " + poolService.poolName() + " dogecoin mining pool</h1>");
-        html.append("<p>" + poolService.miningUsers().count().toBlocking().single() + " users currently mining, for a global hashrate of "
-                + poolService.poolGigaHashrate().toBlocking().first() + " GHash/s</p>");
-
-        exchangeRateService.dogeToCurrencyExchangeRate("USD")
-                .doOnNext(r -> html.append("<p>1 DOGE = ").append(r).append("$<br/>"))
-                .doOnError(e -> html.append("<p>1 DOGE = ??$, couldn't get the exchange rate - ").append(e).append("</br>"))
-                .onErrorReturn(null)
-                .toBlocking().last();
-        exchangeRateService.dogeToCurrencyExchangeRate("EUR")
-                .doOnNext(r -> html.append("1 DOGE = ").append(r).append("€</p>"))
-                .doOnError(e -> html.append("1 DOGE = ??€, couldn't get the exchange rate - ").append(e).append("</p>"))
-                .onErrorReturn(null)
-                .toBlocking().last();
-
-        html.append("<p><h3>----- TOP 10 Miners by Hashrate -----</h3>");
-        int rank = 1;
-        for (UserStat userStat : hashLadder) {
-            html.append("<br/>").append(rank++)
-                    .append(": ").append(userStat.user.nickname)
-                    .append(", ").append(userStat.hashrate).append(" GHash/s");
-        }
-        html.append("</p>");
-
-        html.append("<p><h3>----- TOP 10 Miners by Coins Found -----</h3>");
-        rank = 1;
-        for (UserStat userStat : coinsLadder) {
-            html.append("<br/>").append(rank++).append(": ")
-                    .append(userStat.user.nickname).append(", ")
-                    .append(userStat.totalCoinsMined).append(" dogecoins");
-        }
-        html.append("</p>");
-        html.append("</body></html>");
-        return html.toString();
+        //populate the model and call the template
+        model.put("model", modelZip.toBlocking().single());
+        return "index";
     }
 }

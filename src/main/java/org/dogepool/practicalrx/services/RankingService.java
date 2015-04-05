@@ -24,7 +24,7 @@ public class RankingService {
      */
     public Observable<Integer> rankByHashrate(User user) {
         return rankByHashrate()
-                .takeUntil(stat -> stat.user == user)
+                .takeUntil(stat -> stat.user.equals(user))
                 .count();
     }
 
@@ -34,7 +34,7 @@ public class RankingService {
      */
     public Observable<Integer> rankByCoins(User user) {
         return rankByCoins()
-                .takeUntil(userStat -> user == userStat.user)
+                .takeUntil(userStat -> user.equals(userStat.user))
                 .count();
     }
 

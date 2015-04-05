@@ -20,7 +20,7 @@ public class HashrateService {
      */
     public Observable<Double> hashrateFor(User user) {
         User otherUser = userService.getUser(0).toBlocking().first();
-        if (user == otherUser) {
+        if (user.equals(otherUser)) {
             return Observable.just(1.234);
         }
         return Observable.just(user.displayName)

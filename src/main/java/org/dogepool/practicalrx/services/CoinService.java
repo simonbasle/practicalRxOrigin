@@ -16,7 +16,7 @@ public class CoinService {
 
     public Observable<Long> totalCoinsMinedBy(User user) {
         User otherUser = userService.getUser(1).toBlocking().single();
-        if (user == otherUser) {
+        if (user.equals(otherUser)) {
             return Observable.just(12L);
         }
         return Observable.just(0L);
