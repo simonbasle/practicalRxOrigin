@@ -1,7 +1,6 @@
 package org.dogepool.practicalrx.services;
 
 import org.dogepool.practicalrx.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
 
@@ -11,12 +10,8 @@ import rx.Observable;
 @Service
 public class CoinService {
 
-    @Autowired
-    UserService userService;
-
     public Observable<Long> totalCoinsMinedBy(User user) {
-        User otherUser = userService.getUser(1).toBlocking().single();
-        if (user.equals(otherUser)) {
+        if (user.equals(User.OTHERUSER)) {
             return Observable.just(12L);
         }
         return Observable.just(0L);
