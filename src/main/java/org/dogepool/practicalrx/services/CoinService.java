@@ -1,7 +1,6 @@
 package org.dogepool.practicalrx.services;
 
 import org.dogepool.practicalrx.domain.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,16 +9,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CoinService {
 
-    @Autowired
-    UserService userService;
-
     public void totalCoinsMinedBy(User user, ServiceCallback<Long> callback) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {
                 Long coins;
-                User otherUser = userService.getUser(1);
-                if (user.equals(otherUser)) {
+                if (user.equals(User.OTHERUSER)) {
                     coins = 12L;
                 } else {
                     coins = 0L;
