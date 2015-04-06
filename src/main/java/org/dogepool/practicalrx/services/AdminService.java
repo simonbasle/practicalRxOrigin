@@ -21,11 +21,7 @@ public class AdminService {
     }
 
     public Observable<BigInteger> costForMonth(int year, Month month) {
-        return Observable
-                .<LocalDate>create(s -> {
-                    s.onNext(LocalDate.now());
-                    s.onCompleted();
-                })
+        return Observable.just(LocalDate.now())
                 .map(now -> {
                     if (year == now.getYear() && month == now.getMonth()) {
                         return BigInteger.valueOf(currentCosts.longValue());
