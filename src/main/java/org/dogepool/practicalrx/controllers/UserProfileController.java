@@ -44,7 +44,7 @@ public class UserProfileController {
     @RequestMapping(value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DeferredResult<UserProfile> profile(@PathVariable int id) {
         DeferredResult<UserProfile> deferred = new DeferredResult<>(90000);
-        User user = userService.getUser(id).toBlocking().single();
+        User user = userService.getUser(id).toBlocking().singleOrDefault(null);
         if (user == null) {
             deferred.setErrorResult(new DogePoolException("Unknown miner", Error.UNKNOWN_USER, HttpStatus.NOT_FOUND));
             return deferred;

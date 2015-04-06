@@ -35,7 +35,7 @@ public class Main {
             //connect USER automatically and wait
             userService.getUser(0)
                        .flatMap(user -> poolService.connectUser(user))
-                       .toBlocking().first();
+                       .toBlocking().singleOrDefault(false);
 
             //display welcome screen in console
             List<UserStat> hashLadder = rankinService.getLadderByHashrate().toList().toBlocking().single();

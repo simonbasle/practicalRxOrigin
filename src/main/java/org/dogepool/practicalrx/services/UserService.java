@@ -35,13 +35,13 @@ public class UserService {
     public Observable<User> getUser(long id) {
         return findAll()
                 .filter(u -> u.id == id)
-                .last();
+                .take(1);
     }
 
     public Observable<User> getUserByLogin(String login) {
         return findAll()
                 .filter(u -> login.equals(u.nickname))
-                .last();
+                .take(1);
     }
 
     public Observable<User> findAll() {
