@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.servlet.ModelAndView;
 import rx.Observable;
 
 /**
@@ -29,7 +31,9 @@ public class IndexController {
     private ExchangeRateService exchangeRateService;
 
     @RequestMapping("/")
-    public String index(Map<String, Object> model) {
+    public DeferredResult<ModelAndView> index(Map<String, Object> model) {
+        DeferredResult<ModelAndView> deferredResult = new DeferredResult<>();
+
         //prepare the error catching observable for currency rates
         Observable<String> doge2usd = exchangeRateService.dogeToCurrencyExchangeRate("USD")
                 .map(rate -> "1 DOGE = " + rate + "$")
@@ -57,8 +61,10 @@ public class IndexController {
                     return idxModel;
                 });
 
-        //populate the model and call the template
-        model.put("model", modelZip.toBlocking().single());
-        return "index";
+        //populate the model and call the template asynchronously
+        modelZip.subscribe(
+                idx -> deferredResult.setResult(new ModelAndView("index", "model", idx)),
+                error -> deferredResult.setErrorResult(error));
+        return deferredResult;
     }
 }
