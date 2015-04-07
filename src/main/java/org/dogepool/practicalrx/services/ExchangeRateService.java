@@ -39,7 +39,7 @@ public class ExchangeRateService {
         Observable<Double> dollarToCurrency =
                 dollarToCurrency(targetCurrencyCode)
                 .doOnError(e -> System.out.println("FALLING BACK TO NON-FREE EXCHANGE RATE SERVICE"))
-                .onErrorResumeNext(t -> (t instanceof ResourceAccessException)
+                .onErrorResumeNext(t -> (t instanceof DogePoolException)
                         ? dollarToCurrencyNonFree(targetCurrencyCode)
                         : Observable.error(t));
 
