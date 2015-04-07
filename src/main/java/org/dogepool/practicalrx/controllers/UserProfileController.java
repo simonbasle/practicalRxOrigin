@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -40,6 +41,7 @@ public class UserProfileController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @ResponseBody
     @RequestMapping(value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DeferredResult<UserProfile> profile(@PathVariable int id) {
         DeferredResult<UserProfile> deferred = new DeferredResult<>(90000);
