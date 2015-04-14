@@ -53,16 +53,18 @@ public class PoolController {
             json.put("hashrate", ghashrate * 100d);
         } else {
             json.put("unit", "GHash/s");
-            json.put("hashrate", poolService.poolGigaHashrate());
+            json.put("hashrate", ghashrate);
         }
         return json;
     }
 
     @RequestMapping("/miners")
     public Map<String, Object> miners() {
+        int allUsers = userService.findAll().size();
+        int miningUsers = poolService.miningUsers().size();
         Map<String, Object> json = new HashMap<>(2);
-        json.put("totalUsers", userService.findAll().size());
-        json.put("totalMiningUsers", poolService.miningUsers().size());
+        json.put("totalUsers", allUsers);
+        json.put("totalMiningUsers", miningUsers);
         return json;
     }
 

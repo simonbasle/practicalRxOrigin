@@ -1,8 +1,10 @@
 package org.dogepool.practicalrx.controllers;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.dogepool.practicalrx.domain.User;
@@ -37,8 +39,9 @@ public class AdminController {
     public ResponseEntity<Object> registerMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id);
         if (user != null) {
-            poolService.connectUser(user);
-            return new ResponseEntity<>(poolService.miningUsers(), HttpStatus.ACCEPTED);
+            boolean connected = poolService.connectUser(user);
+            List<User> miningUsers = poolService.miningUsers();
+            return new ResponseEntity<>(miningUsers, HttpStatus.ACCEPTED);
         } else {
             throw new DogePoolException("User cannot mine, not authenticated", Error.BAD_USER, HttpStatus.NOT_FOUND);
         }
@@ -48,8 +51,9 @@ public class AdminController {
     public ResponseEntity<Object> deregisterMiningUser(@PathVariable("id") long id) {
         User user = userService.getUser(id);
         if (user != null) {
-            poolService.disconnectUser(user);
-            return new ResponseEntity<>(poolService.miningUsers(), HttpStatus.ACCEPTED);
+            boolean disconnected = poolService.disconnectUser(user);
+            List<User> miningUsers = poolService.miningUsers();
+            return new ResponseEntity<>(miningUsers, HttpStatus.ACCEPTED);
         } else {
             throw new DogePoolException("User is not mining, not authenticated", Error.BAD_USER, HttpStatus.NOT_FOUND);
         }
@@ -69,9 +73,11 @@ public class AdminController {
 
     @RequestMapping("/cost/{year}/{month}")
     protected Map<String, Object> cost(@PathVariable int year, @PathVariable Month month) {
+        BigInteger cost = adminService.costForMonth(year, month);
+
         Map<String, Object> json = new HashMap<>();
         json.put("month", month + " " + year);
-        json.put("cost", adminService.costForMonth(year, month));
+        json.put("cost", cost);
         json.put("currency", "USD");
         json.put("currencySign", "$");
         return json;

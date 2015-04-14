@@ -33,23 +33,29 @@ public class Main {
 
             User user = userService.getUser(0);
             //connect USER automatically
-            poolService.connectUser(user);
+            boolean connected = poolService.connectUser(user);
 
-            //display welcome screen in console
+            //gather data
             List<UserStat> hashLadder = rankinService.getLadderByHashrate();
             List<UserStat> coinsLadder = rankinService.getLadderByCoins();
+            String poolName = poolService.poolName();
+            List<User> miningUsers = poolService.miningUsers();
+            double poolRate = poolService.poolGigaHashrate();
 
-            System.out.println("Welcome to " + poolService.poolName() + " dogecoin mining pool!");
-            System.out.println(poolService.miningUsers().size() + " users currently mining, for a global hashrate of "
-                    + poolService.poolGigaHashrate() + " GHash/s");
+            //display welcome screen in console
+            System.out.println("Welcome to " + poolName + " dogecoin mining pool!");
+            System.out.println(miningUsers.size() + " users currently mining, for a global hashrate of "
+                    + poolRate + " GHash/s");
 
             try {
-                System.out.println("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("USD") + "$");
+                Double dogeToDollar = exchangeRateService.dogeToCurrencyExchangeRate("USD");
+                System.out.println("1 DOGE = " + dogeToDollar + "$");
             } catch (Exception e) {
                 System.out.println("1 DOGE = ??$, couldn't get the exchange rate - " + e);
             }
             try {
-                System.out.println("1 DOGE = " + exchangeRateService.dogeToCurrencyExchangeRate("EUR") + "€");
+                Double dogeToEuro =  exchangeRateService.dogeToCurrencyExchangeRate("EUR");
+                System.out.println("1 DOGE = " + dogeToEuro + "€");
             } catch (Exception e) {
                 System.out.println("1 DOGE = ??€, couldn't get the exchange rate - " + e);
             }

@@ -38,13 +38,15 @@ public class PoolService {
         return hashrate;
     }
 
-    public void connectUser(User user) {
+    public boolean connectUser(User user) {
         connectedUsers.add(user);
         System.out.println(connectedUsers);
+        return true;
     }
 
-    public void disconnectUser(User user) {
+    public boolean disconnectUser(User user) {
         connectedUsers.remove(user);
         System.out.println(connectedUsers);
+        return true;
     }
 }
