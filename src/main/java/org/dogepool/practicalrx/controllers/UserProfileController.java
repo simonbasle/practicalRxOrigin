@@ -2,11 +2,13 @@ package org.dogepool.practicalrx.controllers;
 
 import java.util.Map;
 
-import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserProfile;
-import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.DogePoolException;
 import org.dogepool.practicalrx.error.Error;
-import org.dogepool.practicalrx.services.*;
+import org.dogepool.practicalrx.services.CoinService;
+import org.dogepool.practicalrx.services.HashrateService;
+import org.dogepool.practicalrx.services.RankingService;
+import org.dogepool.practicalrx.services.UserService;
 import org.dogepool.practicalrx.views.models.MinerModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.async.DeferredResult;
-import org.springframework.web.servlet.ModelAndView;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
@@ -44,6 +45,7 @@ public class UserProfileController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @ResponseBody
     @RequestMapping(value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DeferredResult<UserProfile> profile(@PathVariable int id) {
         DeferredResult<UserProfile> deferred = new DeferredResult<>();

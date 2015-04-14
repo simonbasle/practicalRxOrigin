@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.dogepool.practicalrx.domain.User;
-import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.DogePoolException;
 import org.dogepool.practicalrx.error.Error;
 import org.dogepool.practicalrx.services.AdminService;
 import org.dogepool.practicalrx.services.PoolService;
@@ -15,7 +15,6 @@ import org.dogepool.practicalrx.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

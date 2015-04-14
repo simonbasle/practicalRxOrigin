@@ -33,17 +33,21 @@ public class Main {
             couchbaseBucket.upsert(u2);
 
             //connect USER automatically and wait
-            userService.getUser(0)
+            boolean connected = userService.getUser(0)
                        .flatMap(user -> poolService.connectUser(user))
                        .toBlocking().singleOrDefault(false);
 
-            //display welcome screen in console
+            //gather data
             List<UserStat> hashLadder = rankinService.getLadderByHashrate().toList().toBlocking().single();
             List<UserStat> coinsLadder = rankinService.getLadderByCoins().toList().toBlocking().single();
-
-            System.out.println("Welcome to " + poolService.poolName() + " dogecoin mining pool!");
-            System.out.println(poolService.miningUsers().count().toBlocking().single() + " users currently mining, for a global hashrate of "
-                + poolService.poolGigaHashrate().toBlocking().first() + " GHash/s");
+            String poolName = poolService.poolName();
+            int miningUsersCount = poolService.miningUsers().count().toBlocking().single();
+            double poolRate = poolService.poolGigaHashrate().toBlocking().first();
+            
+            //display welcome screen in console
+            System.out.println("Welcome to " + poolName + " dogecoin mining pool!");
+            System.out.println(miningUsersCount + " users currently mining, for a global hashrate of "
+                    + poolRate + " GHash/s");
 
             exchangeRateService.dogeToCurrencyExchangeRate("USD").subscribe(
                     r -> System.out.println("1 DOGE = " + r + "$"),
