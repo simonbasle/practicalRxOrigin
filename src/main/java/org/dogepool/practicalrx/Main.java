@@ -39,12 +39,12 @@ public class Main {
             List<UserStat> hashLadder = rankinService.getLadderByHashrate();
             List<UserStat> coinsLadder = rankinService.getLadderByCoins();
             String poolName = poolService.poolName();
-            List<User> miningUsers = poolService.miningUsers();
+            int miningUserCount = poolService.miningUsers().size();
             double poolRate = poolService.poolGigaHashrate();
 
             //display welcome screen in console
             System.out.println("Welcome to " + poolName + " dogecoin mining pool!");
-            System.out.println(miningUsers.size() + " users currently mining, for a global hashrate of "
+            System.out.println(miningUserCount + " users currently mining, for a global hashrate of "
                     + poolRate + " GHash/s");
 
             try {
