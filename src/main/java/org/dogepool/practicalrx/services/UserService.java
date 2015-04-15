@@ -26,7 +26,7 @@ import rx.Observable;
 @Service
 public class UserService {
 
-    @Autowired
+    @Autowired(required = false)
     private Bucket couchbaseBucket;
 
     @Value("${store.enableFindAll:false}")
@@ -45,7 +45,7 @@ public class UserService {
     }
 
     public Observable<User> findAll() {
-        if (useCouchbaseForFindAll) {
+        if (useCouchbaseForFindAll && couchbaseBucket != null) {
             try {
                 Statement statement = Select.select("avatarId", "bio", "displayName", "id", "nickname").from(x("default"))
                         .where(x("type").eq(s("user"))).groupBy(x("displayName"));
