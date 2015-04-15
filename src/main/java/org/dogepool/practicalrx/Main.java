@@ -10,11 +10,15 @@ import org.dogepool.practicalrx.services.ExchangeRateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
 import org.dogepool.practicalrx.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 
 @SpringBootApplication
 public class Main {
@@ -24,13 +28,22 @@ public class Main {
     }
 
     @Bean
-    CommandLineRunner commandLineRunner(Bucket couchbaseBucket, UserService userService, RankingService rankinService, PoolService poolService, ExchangeRateService exchangeRateService) {
+    @ConditionalOnBean(value = Bucket.class)
+    @Order(value = 1)
+    CommandLineRunner userCreation(Bucket couchbaseBucket) {
         return args -> {
             JsonDocument u1 = JsonDocument.create(String.valueOf(User.USER.id), User.USER.toJsonObject());
             JsonDocument u2 = JsonDocument.create(String.valueOf(User.OTHERUSER.id), User.OTHERUSER.toJsonObject());
             couchbaseBucket.upsert(u1);
             couchbaseBucket.upsert(u2);
+        };
+    }
 
+    @Bean
+    @Order(value = 2)
+    CommandLineRunner commandLineRunner(UserService userService, RankingService rankinService,
+            PoolService poolService, ExchangeRateService exchangeRateService) {
+        return args -> {
             User user = userService.getUser(0);
             //connect USER automatically
             boolean connected = poolService.connectUser(user);

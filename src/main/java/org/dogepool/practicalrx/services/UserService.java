@@ -17,6 +17,7 @@ import org.dogepool.practicalrx.error.DogePoolException;
 import org.dogepool.practicalrx.error.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    @Autowired
+    @Autowired(required = false)
     private Bucket couchbaseBucket;
 
     @Value("${store.enableFindAll:false}")
@@ -53,7 +54,7 @@ public class UserService {
     }
 
     public List<User> findAll() {
-        if (useCouchbaseForFindAll) {
+        if (useCouchbaseForFindAll && couchbaseBucket != null) {
             try {
                 Statement statement = Select.select("avatarId", "bio", "displayName", "id", "nickname").from(x("default"))
                                             .where(x("type").eq(s("user"))).groupBy(x("displayName"));
