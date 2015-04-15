@@ -28,4 +28,33 @@ public class DogePoolException extends RuntimeException {
         this.errorCategory = errorCategory;
         this.errorCode = errorCode;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        DogePoolException that = (DogePoolException) o;
+
+        if (errorCode != that.errorCode) {
+            return false;
+        }
+        if (httpStatus != that.httpStatus) {
+            return false;
+        }
+        return errorCategory == that.errorCategory;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = httpStatus.hashCode();
+        result = 31 * result + errorCategory.hashCode();
+        result = 31 * result + errorCode;
+        return result;
+    }
 }

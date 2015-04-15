@@ -45,7 +45,6 @@ public class UserProfileController {
     @Autowired
     private RestTemplate restTemplate;
 
-    @ResponseBody
     @RequestMapping(value = "/miner/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public DeferredResult<UserProfile> profile(@PathVariable int id) {
         DeferredResult<UserProfile> deferred = new DeferredResult<>();
