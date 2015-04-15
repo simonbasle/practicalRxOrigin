@@ -15,6 +15,9 @@ public class AdminService {
     public BigInteger costForMonth(int year, Month month) {
         LocalDate now = LocalDate.now();
 
+        if (year == now.getYear() && month == now.getMonth()) {
+            return BigInteger.ZERO;
+        }
         if (year > now.getYear()
             || year == now.getYear() && month.getValue() > now.getMonthValue()) {
             return BigInteger.ZERO;
