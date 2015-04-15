@@ -39,6 +39,6 @@ public class IndexControllerTest {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(model().attributeHasNoErrors("model"))
-                .andExpect(content().contentType(MediaType.TEXT_HTML));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
     }
 }

@@ -80,10 +80,10 @@ public class AdminControllerTest {
 
     @Test
     public void testCostMonthName() throws Exception {
-        mockMvc.perform(get("/admin/cost/2015/APRIL"))
+        mockMvc.perform(get("/admin/cost/2015/JANUARY"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("{\"cost\":2415,\"month\":\"APRIL 2015\"," +
+                .andExpect(content().json("{\"cost\":2115,\"month\":\"JANUARY 2015\"," +
                         "\"currencySign\":\"$\",\"currency\":\"USD\"}"));
     }
 
@@ -95,10 +95,10 @@ public class AdminControllerTest {
 
     @Test
     public void testCostMonthNumber() throws Exception {
-        mockMvc.perform(get("/admin/cost/2015-04"))
+        mockMvc.perform(get("/admin/cost/2015-01"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json("{\"cost\":2415,\"month\":\"APRIL 2015\"," +
+                .andExpect(content().json("{\"cost\":2115,\"month\":\"JANUARY 2015\"," +
                         "\"currencySign\":\"$\",\"currency\":\"USD\"}"));
     }
 }
