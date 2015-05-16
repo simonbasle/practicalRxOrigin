@@ -2,8 +2,8 @@ package org.dogepool.practicalrx.controllers;
 
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.startsWith;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
@@ -55,6 +55,7 @@ public class RateControllerTest {
 
     @Test
     public void testRateBadCurrencyTooLong() throws Exception {
+        //Note: the configuration of test has a timeout of 6 seconds, which will always succeed
         MvcResult mvcResult = mockMvc.perform(get("/rate/EURO").accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(request().asyncStarted())
@@ -62,14 +63,13 @@ public class RateControllerTest {
                 .andReturn();
 
         mockMvc.perform(asyncDispatch(mvcResult))
-               .andExpect(status().isNotFound());
-
-        String resultErrorMessage = mvcResult.getAsyncResult().toString();
-        assertTrue(resultErrorMessage, resultErrorMessage.contains("Unknown currency EURO"));
+               .andExpect(status().isNotFound())
+               .andExpect(content().string(containsString("Unknown currency EURO")));
     }
 
     @Test
     public void testRateBadCurrencyBadCase() throws Exception {
+        //Note: the configuration of test has a timeout of 6 seconds, which will always succeed
         MvcResult mvcResult = mockMvc.perform(get("/rate/EuR").accept(MediaType.APPLICATION_JSON))
                                      .andExpect(status().isOk())
                                      .andExpect(request().asyncStarted())
@@ -77,9 +77,7 @@ public class RateControllerTest {
                                      .andReturn();
 
         mockMvc.perform(asyncDispatch(mvcResult))
-               .andExpect(status().isNotFound());
-
-        String resultErrorMessage = mvcResult.getAsyncResult().toString();
-        assertTrue(resultErrorMessage, resultErrorMessage.contains("Unknown currency EuR"));
+               .andExpect(status().isNotFound())
+               .andExpect(content().string(containsString("Unknown currency EuR")));
     }
 }

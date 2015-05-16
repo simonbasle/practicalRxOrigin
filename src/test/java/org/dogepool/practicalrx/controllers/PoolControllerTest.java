@@ -1,10 +1,8 @@
 package org.dogepool.practicalrx.controllers;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dogepool.practicalrx.Main;
@@ -33,15 +31,6 @@ public class PoolControllerTest {
     @Before
     public void setup() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
-
-    @Test
-    public void testIndex() throws Exception {
-        mockMvc.perform(get("/"))
-               .andExpect(status().isOk())
-               .andExpect(model().attributeHasNoErrors("model"))
-               .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML));
     }
 
     @Test

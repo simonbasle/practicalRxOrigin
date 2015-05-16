@@ -2,17 +2,16 @@ package org.dogepool.practicalrx.services;
 
 import java.util.Map;
 
-import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.DogePoolException;
 import org.dogepool.practicalrx.error.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * A facade service to get DOGE to USD and DOGE to other currencies exchange rates.
@@ -76,6 +75,9 @@ public class ExchangeRateService {
                 }
                 sub.onNext(rate);
                 sub.onCompleted();
+            } catch (HttpStatusCodeException e) {
+                sub.onError(new DogePoolException("Error processing currency in free API : " + e.getResponseBodyAsString(),
+                        Error.BAD_CURRENCY, e.getStatusCode()));
             } catch (RestClientException e) {
                 sub.onError(new DogePoolException("Unable to reach free currency exchange service at " + exchangeUrl,
                         Error.UNREACHABLE_SERVICE, HttpStatus.REQUEST_TIMEOUT));
@@ -98,6 +100,9 @@ public class ExchangeRateService {
                 }
                 sub.onNext(rate);
                 sub.onCompleted();
+            } catch (HttpStatusCodeException e) {
+                sub.onError(new DogePoolException("Error processing currency in non-free API : " + e.getResponseBodyAsString(),
+                        Error.BAD_CURRENCY, e.getStatusCode()));
             } catch (RestClientException e) {
                 sub.onError(new DogePoolException("Unable to reach non-free currency exchange service at " + exchangeUrl,
                         Error.UNREACHABLE_SERVICE, HttpStatus.REQUEST_TIMEOUT));
