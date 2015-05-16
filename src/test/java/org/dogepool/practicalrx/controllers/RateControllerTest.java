@@ -1,11 +1,9 @@
 package org.dogepool.practicalrx.controllers;
 
-import static org.hamcrest.Matchers.*;
-import static org.mockito.AdditionalMatchers.and;
-import static org.mockito.AdditionalMatchers.or;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.dogepool.practicalrx.Main;
@@ -45,15 +43,17 @@ public class RateControllerTest {
 
     @Test
     public void testRateBadCurrencyTooLong() throws Exception {
-        //TODO improve
+        //Note: the configuration of test has a timeout of 6 seconds, which will always succeed
         mockMvc.perform(get("/rate/EURO").accept(MediaType.APPLICATION_JSON))
-               .andExpect(status().isRequestTimeout());
+               .andExpect(status().isNotFound())
+               .andExpect(content().string(containsString("Unknown currency EURO")));
     }
 
     @Test
     public void testRateBadCurrencyBadCase() throws Exception {
-        //TODO improve
+        //Note: the configuration of test has a timeout of 6 seconds, which will always succeed
         mockMvc.perform(get("/rate/EuR").accept(MediaType.APPLICATION_JSON))
-               .andExpect(status().isRequestTimeout());
+               .andExpect(status().isNotFound())
+               .andExpect(content().string(containsString("Unknown currency EuR")));
     }
 }

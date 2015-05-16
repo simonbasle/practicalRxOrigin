@@ -2,12 +2,13 @@ package org.dogepool.practicalrx.services;
 
 import java.util.Map;
 
-import org.dogepool.practicalrx.error.*;
+import org.dogepool.practicalrx.error.DogePoolException;
 import org.dogepool.practicalrx.error.Error;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -58,6 +59,9 @@ public class ExchangeRateService {
                 throw new DogePoolException("Malformed exchange rate", Error.BAD_CURRENCY, HttpStatus.UNPROCESSABLE_ENTITY);
             }
             return rate;
+        } catch (HttpStatusCodeException e) {
+            throw new DogePoolException("Error processing currency in free API : " + e.getResponseBodyAsString(),
+                    Error.BAD_CURRENCY, e.getStatusCode());
         } catch (RestClientException e) {
             throw new DogePoolException("Unable to reach currency exchange service at " + exchangeUrl,
                     Error.UNREACHABLE_SERVICE, HttpStatus.REQUEST_TIMEOUT);
