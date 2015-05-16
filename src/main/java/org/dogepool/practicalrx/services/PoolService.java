@@ -16,37 +16,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class PoolService {
 
-    @Autowired
-    private HashrateService hashrateService;
+    private final Set<User> connectedUsers = new HashSet<>();
 
     public String poolName() {
         return "Wow Such Pool!";
     }
 
-    private final Set<User> connectedUsers = new HashSet<>();
-
     public List<User> miningUsers() {
         return new ArrayList<>(connectedUsers);
     }
 
-    public double poolGigaHashrate() {
-        double hashrate = 0d;
-        for (User u : miningUsers()) {
-            double userRate = hashrateService.hashrateFor(u);
-            hashrate += userRate;
-        }
-        return hashrate;
-    }
-
     public boolean connectUser(User user) {
         connectedUsers.add(user);
-        System.out.println(connectedUsers);
+        System.out.println(user.nickname + " connected");
         return true;
     }
 
     public boolean disconnectUser(User user) {
         connectedUsers.remove(user);
-        System.out.println(connectedUsers);
+        System.out.println(user.nickname + " disconnected");
         return true;
     }
 }

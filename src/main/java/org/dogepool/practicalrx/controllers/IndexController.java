@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.ExchangeRateService;
+import org.dogepool.practicalrx.services.PoolRateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
 import org.dogepool.practicalrx.views.models.IndexModel;
@@ -24,6 +25,9 @@ public class IndexController {
     private PoolService poolService;
 
     @Autowired
+    private PoolRateService poolRateService;
+
+    @Autowired
     private ExchangeRateService exchangeRateService;
 
     @RequestMapping("/")
@@ -34,7 +38,7 @@ public class IndexController {
         idxModel.setCoinsLadder(rankService.getLadderByCoins());
         idxModel.setPoolName(poolService.poolName());
         idxModel.setMiningUserCount(poolService.miningUsers().size());
-        idxModel.setGigaHashrate(poolService.poolGigaHashrate());
+        idxModel.setGigaHashrate(poolRateService.poolGigaHashrate());
         try {
             Double dogeToDollar = exchangeRateService.dogeToCurrencyExchangeRate("USD");
             idxModel.setDogeToUsdMessage("1 DOGE = " + dogeToDollar + "$");

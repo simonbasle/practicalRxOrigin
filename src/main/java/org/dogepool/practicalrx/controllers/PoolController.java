@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
+import org.dogepool.practicalrx.services.PoolRateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
 import org.dogepool.practicalrx.services.StatService;
@@ -32,6 +33,9 @@ public class PoolController {
     private PoolService poolService;
 
     @Autowired
+    private PoolRateService poolRateService;
+
+    @Autowired
     private StatService statService;
 
     @RequestMapping("/ladder/hashrate")
@@ -47,7 +51,7 @@ public class PoolController {
     @RequestMapping("/hashrate")
     public Map<String, Object> globalHashRate() {
         Map<String, Object> json = new HashMap<>(2);
-        double ghashrate = poolService.poolGigaHashrate();
+        double ghashrate = poolRateService.poolGigaHashrate();
         if (ghashrate < 1) {
             json.put("unit", "MHash/s");
             json.put("hashrate", ghashrate * 100d);
