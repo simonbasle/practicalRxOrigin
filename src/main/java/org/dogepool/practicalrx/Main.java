@@ -7,6 +7,7 @@ import com.couchbase.client.java.document.JsonDocument;
 import org.dogepool.practicalrx.domain.User;
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.ExchangeRateService;
+import org.dogepool.practicalrx.services.PoolRateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
 import org.dogepool.practicalrx.services.UserService;
@@ -40,7 +41,7 @@ public class Main {
     @Bean
     @Order(value = 2)
     CommandLineRunner commandLineRunner(UserService userService, RankingService rankinService,
-            PoolService poolService, ExchangeRateService exchangeRateService) {
+            PoolService poolService, PoolRateService poolRateService, ExchangeRateService exchangeRateService) {
         return args -> {
             //connect USER automatically and wait
             boolean connected = userService.getUser(0)
@@ -52,7 +53,7 @@ public class Main {
             List<UserStat> coinsLadder = rankinService.getLadderByCoins().toList().toBlocking().single();
             String poolName = poolService.poolName();
             int miningUsersCount = poolService.miningUsers().count().toBlocking().single();
-            double poolRate = poolService.poolGigaHashrate().toBlocking().first();
+            double poolRate = poolRateService.poolGigaHashrate().toBlocking().first();
             
             //display welcome screen in console
             System.out.println("Welcome to " + poolName + " dogecoin mining pool!");

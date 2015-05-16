@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.dogepool.practicalrx.domain.UserStat;
 import org.dogepool.practicalrx.services.ExchangeRateService;
+import org.dogepool.practicalrx.services.PoolRateService;
 import org.dogepool.practicalrx.services.PoolService;
 import org.dogepool.practicalrx.services.RankingService;
 import org.dogepool.practicalrx.views.models.IndexModel;
@@ -28,6 +29,9 @@ public class IndexController {
     private PoolService poolService;
 
     @Autowired
+    private PoolRateService poolRateService;
+
+    @Autowired
     private ExchangeRateService exchangeRateService;
 
     @RequestMapping("/")
@@ -46,7 +50,7 @@ public class IndexController {
                 rankService.getLadderByHashrate().toList(),
                 rankService.getLadderByCoins().toList(),
                 poolService.miningUsers().count(),
-                poolService.poolGigaHashrate(),
+                poolRateService.poolGigaHashrate(),
                 doge2usd,
                 doge2eur,
                 (lh, lc, muc, pgr, d2u, d2e) -> {
