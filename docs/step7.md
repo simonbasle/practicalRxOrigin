@@ -2,27 +2,27 @@
 Start from branch `step6`, solution is in branch `step7`.
 
 ## The Problem
-`StatService.lastBlockFoundBy` has a not-so fireproof implementation (choose a random `User`).
+`StatService.lastBlockFoundBy` has an intermittent bug that causes it to crash with an `IndexOutOfBoundsException`.
 
-But what if… we wanted to do it without knowing the number of users in advance?
+We'd like to retry the call when this happens to prevent this error.
 
 ## The Plan
-Generate an index randomly (within a broadly guessed limit)
+Make the method observable:
 
-Retry up to 4 times if out of bounds
+  - Have the index randomly generated inside an `Observable.defer`.
+  - Have the generated index logged in a `doOnNext`.
+  - Chain in a `flatMap` that calls `UserService.findAll()` and picks the user via `elementAt(i)`.
 
-Last resort: use a default `User` (eg. “Banned User”)
+Migrate code that uses this method as before. It still randomly fails.
+
+Make it automatically retry by chaining in the `retry()` operator.
+
+Edit the `PoolController.lastBlock()` method so it doesn't catch and recover.
+Execute test `PoolControllerTest.testLastBlock()` and verifies it succeeds, sometimes printing
+several "ELECTED" messages (the retry in action).
 
 ## Useful Operators
+* `defer`
 * `flatMap`
-* `skip`
+* `elementAt`
 * `retry`
-* `onErrorReturn`
-
-## Trap #1
-**skip doesn’t error if overflow**
->=> combine with `first`/`last` to trigger an exception
-
-## Trap #2
-**`just` caches the value**
->=> use `create` to regenerate at each retry

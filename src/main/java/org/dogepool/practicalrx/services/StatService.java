@@ -46,7 +46,10 @@ public class StatService {
 
     public User lastBlockFoundBy() {
         Random rng = new Random(System.currentTimeMillis());
+        int potentiallyBadIndex = rng.nextInt(10);
+        System.out.println("ELECTED: #" + potentiallyBadIndex);
+
         List<User> allUsers = userService.findAll();
-        return allUsers.get(rng.nextInt(allUsers.size()));
+        return allUsers.get(potentiallyBadIndex);
     }
 }
