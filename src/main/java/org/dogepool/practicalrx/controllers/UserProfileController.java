@@ -60,14 +60,9 @@ public class UserProfileController {
                 double hash = hashrateService.hashrateFor(user);
                 long rankByHash = rankingService.rankByHashrate(user);
                 long rankByCoins = rankingService.rankByCoins(user);
-                coinService.totalCoinsMinedBy(user, new ServiceCallback<Long>() {
-                    @Override
-                    public void onSuccess(Long coins) {
-                        deferred.setResult(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl,
-                                rankByHash, rankByCoins));
-                    }
-                });
+                long coins = coinService.totalCoinsMinedBy(user);
 
+                deferred.setResult(new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins));
                 return deferred;
             } else {
                 deferred.setErrorResult(new DogePoolException("Unable to get avatar info", Error.UNREACHABLE_SERVICE,
@@ -96,23 +91,19 @@ public class UserProfileController {
                 double hash = hashrateService.hashrateFor(user);
                 long rankByHash = rankingService.rankByHashrate(user);
                 long rankByCoins = rankingService.rankByCoins(user);
-                coinService.totalCoinsMinedBy(user, new ServiceCallback<Long>() {
-                    @Override
-                    public void onSuccess(Long coins) {
-                        UserProfile profile = new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins);
-                        User user = profile.user;
-                        MinerModel minerModel = new MinerModel();
-                        minerModel.setAvatarUrl(profile.avatarUrl);
-                        minerModel.setSmallAvatarUrl(profile.smallAvatarUrl);
-                        minerModel.setBio(user.bio);
-                        minerModel.setDisplayName(user.displayName);
-                        minerModel.setNickname(user.nickname);
-                        minerModel.setRankByCoins(profile.rankByCoins);
-                        minerModel.setRankByHash(profile.rankByHash);
-                        model.put("minerModel", minerModel);
-                        stringResponse.setResult("miner");
-                    }
-                });
+                long coins = coinService.totalCoinsMinedBy(user);
+
+                UserProfile profile = new UserProfile(user, hash, coins, avatarUrl, smallAvatarUrl, rankByHash, rankByCoins);
+                MinerModel minerModel = new MinerModel();
+                minerModel.setAvatarUrl(profile.avatarUrl);
+                minerModel.setSmallAvatarUrl(profile.smallAvatarUrl);
+                minerModel.setBio(user.bio);
+                minerModel.setDisplayName(user.displayName);
+                minerModel.setNickname(user.nickname);
+                minerModel.setRankByCoins(profile.rankByCoins);
+                minerModel.setRankByHash(profile.rankByHash);
+                model.put("minerModel", minerModel);
+                stringResponse.setResult("miner");
 
                 return stringResponse;
             } else {

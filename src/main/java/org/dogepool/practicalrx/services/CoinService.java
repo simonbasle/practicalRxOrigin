@@ -9,19 +9,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class CoinService {
 
-    public void totalCoinsMinedBy(User user, ServiceCallback<Long> callback) {
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Long coins;
-                if (user.equals(User.OTHERUSER)) {
-                    coins = 12L;
-                } else {
-                    coins = 0L;
-                }
-                callback.onSuccess(coins);
-            }
-        });
-        t.start();
+    public long totalCoinsMinedBy(User user) {
+        if (user.equals(User.OTHERUSER)) {
+            return 12L;
+        } else {
+            return 0L;
+        }
     }
 }
