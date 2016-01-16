@@ -2,6 +2,7 @@ package org.dogepool.practicalrx.services;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Random;
 
 import org.dogepool.practicalrx.domain.User;
@@ -9,7 +10,6 @@ import org.dogepool.practicalrx.domain.UserStat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
-import rx.functions.Func1;
 
 /**
  * Service to get stats on the pool, like top 10 ladders for various criteria.
@@ -44,14 +44,9 @@ public class StatService {
 
     public Observable<User> lastBlockFoundBy() {
         final Random rng = new Random(System.currentTimeMillis());
-        return Observable.<Integer>create(s -> {
-            s.onNext(rng.nextInt(10));
-            s.onCompleted();
-        })
-                         .doOnNext(i -> System.out.println(i))
-                         .flatMap(i -> userService.findAll().skip(i))
-                         .last()
-                         .retry(4)
-                         .onErrorReturn(t -> new User(-1L, "Default", "Banned User", "default", "0"));
+        return Observable.defer(() -> Observable.just(rng.nextInt(10)))
+                .doOnNext(i -> System.out.println("ELECTED: #" + i))
+                .flatMap(potentiallyBadIndex -> userService.findAll().elementAt(potentiallyBadIndex))
+                .retry();
     }
 }
