@@ -13,7 +13,8 @@ public class CoinService {
     public Observable<Long> totalCoinsMinedBy(User user) {
         if (user.equals(User.OTHERUSER)) {
             return Observable.just(12L);
+        } else {
+            return Observable.just(0L);
         }
-        return Observable.just(0L);
     }
 }

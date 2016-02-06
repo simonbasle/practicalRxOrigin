@@ -25,7 +25,7 @@ public class SearchService {
      * @return the stream of matching users.
      */
     public Observable<User> findByName(String namePattern) {
-        final String upperPattern = namePattern.toUpperCase();
+        String upperPattern = namePattern.toUpperCase();
         return userService.findAll()
                 .filter(u -> u.displayName.toUpperCase().contains(upperPattern));
     }
@@ -39,9 +39,9 @@ public class SearchService {
      */
     public Observable<UserStat> findByCoins(long minCoins, long maxCoins) {
         return userService.findAll()
-                          .flatMap(u ->
-                                  coinService.totalCoinsMinedBy(u)
-                                             .filter(coins -> coins >= minCoins && (maxCoins < 0 || coins <= maxCoins))
-                                             .map(coins -> new UserStat(u, -1d, coins)));
+                .flatMap(u -> coinService.totalCoinsMinedBy(u)
+                    .filter(coins -> coins >= minCoins && (maxCoins < 0 || coins <= maxCoins))
+                    .map(coins -> new UserStat(u, -1d, coins))
+                );
     }
 }

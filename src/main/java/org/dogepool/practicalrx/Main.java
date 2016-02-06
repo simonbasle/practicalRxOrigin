@@ -61,21 +61,21 @@ public class Main {
     CommandLineRunner commandLineRunner(UserService userService, RankingService rankinService,
             PoolService poolService, PoolRateService poolRateService, ExchangeRateService exchangeRateService) {
         return args -> {
-            //connect USER automatically and wait
+            //connect USER automatically
             boolean connected = userService.getUser(0)
-                       .flatMap(user -> poolService.connectUser(user))
-                       .toBlocking().singleOrDefault(false);
+                .flatMap(u -> poolService.connectUser(u))
+                .toBlocking().first();
 
             //gather data
-            List<UserStat> hashLadder = rankinService.getLadderByHashrate().toList().toBlocking().single();
-            List<UserStat> coinsLadder = rankinService.getLadderByCoins().toList().toBlocking().single();
+            List<UserStat> hashLadder = rankinService.getLadderByHashrate().toList().toBlocking().first();
+            List<UserStat> coinsLadder = rankinService.getLadderByCoins().toList().toBlocking().first();
             String poolName = poolService.poolName();
-            int miningUsersCount = poolService.miningUsers().count().toBlocking().single();
+            int miningUserCount = poolService.miningUsers().count().toBlocking().first();
             double poolRate = poolRateService.poolGigaHashrate().toBlocking().first();
             
             //display welcome screen in console
             System.out.println("Welcome to " + poolName + " dogecoin mining pool!");
-            System.out.println(miningUsersCount + " users currently mining, for a global hashrate of "
+            System.out.println(miningUserCount + " users currently mining, for a global hashrate of "
                     + poolRate + " GHash/s");
 
             exchangeRateService.dogeToCurrencyExchangeRate("USD").subscribe(

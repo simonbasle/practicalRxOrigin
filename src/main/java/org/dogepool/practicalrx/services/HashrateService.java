@@ -19,6 +19,6 @@ public class HashrateService {
             return Observable.just(1.234);
         }
         return Observable.just(user.displayName)
-                         .map(n -> n.length() / 100d);
+                .map(n -> n.length() / 100d);
     }
 }

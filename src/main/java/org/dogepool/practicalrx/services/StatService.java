@@ -33,7 +33,7 @@ public class StatService {
                     Observable<Long> co = coinService.totalCoinsMinedBy(u);
 
                     return Observable.zip(hr, co, (rate, coin) -> new UserStat(u, rate, coin));
-        });
+                });
     }
 
     public Observable<LocalDateTime> lastBlockFoundDate() {

@@ -40,18 +40,18 @@ public class PoolController {
 
     @RequestMapping("/ladder/hashrate")
     public List<UserStat> ladderByHashrate() {
-        return rankingService.getLadderByHashrate().toList().toBlocking().single();
+        return rankingService.getLadderByHashrate().toList().toBlocking().first();
     }
 
     @RequestMapping("/ladder/coins")
     public List<UserStat> ladderByCoins() {
-        return rankingService.getLadderByCoins().toList().toBlocking().single();
+        return rankingService.getLadderByCoins().toList().toBlocking().first();
     }
 
     @RequestMapping("/hashrate")
     public Map<String, Object> globalHashRate() {
         Map<String, Object> json = new HashMap<>(2);
-        double ghashrate = poolRateService.poolGigaHashrate().toBlocking().single();
+        double ghashrate = poolRateService.poolGigaHashrate().toBlocking().first();
         if (ghashrate < 1) {
             json.put("unit", "MHash/s");
             json.put("hashrate", ghashrate * 100d);
@@ -64,8 +64,8 @@ public class PoolController {
 
     @RequestMapping("/miners")
     public Map<String, Object> miners() {
-        int allUsers = userService.findAll().count().toBlocking().single();
-        int miningUsers = poolService.miningUsers().count().toBlocking().single();
+        int allUsers = userService.findAll().count().toBlocking().first();
+        int miningUsers = poolService.miningUsers().count().toBlocking().first();
         Map<String, Object> json = new HashMap<>(2);
         json.put("totalUsers", allUsers);
         json.put("totalMiningUsers", miningUsers);
@@ -74,15 +74,21 @@ public class PoolController {
 
     @RequestMapping("/miners/active")
     public List<User> activeMiners() {
-        return poolService.miningUsers().toList().toBlocking().single();
+        return poolService.miningUsers().toList().toBlocking().first();
     }
 
     @RequestMapping("/lastblock")
     public Map<String, Object> lastBlock() {
-        LocalDateTime found = statService.lastBlockFoundDate().toBlocking().single();
+        LocalDateTime found = statService.lastBlockFoundDate().toBlocking().first();
         Duration foundAgo = Duration.between(found, LocalDateTime.now());
-        User foundBy = statService.lastBlockFoundBy().toBlocking().single();
 
+        User foundBy;
+        try {
+            foundBy = statService.lastBlockFoundBy().toBlocking().first();
+        } catch (IndexOutOfBoundsException e) {
+            System.err.println("WARNING: StatService failed to return the last user to find a coin");
+            foundBy = new User(-1, "BAD USER", "Bad User from StatService, please ignore", "", null);
+        }
         Map<String, Object> json = new HashMap<>(2);
         json.put("foundOn", found.format(DateTimeFormatter.ISO_DATE_TIME));
         json.put("foundAgo", foundAgo.toMinutes());

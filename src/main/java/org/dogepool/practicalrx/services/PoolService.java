@@ -18,28 +18,26 @@ public class PoolService {
     public String poolName() {
         return "Wow Such Pool!";
     }
-    
+
     public Observable<User> miningUsers() {
         return Observable.from(connectedUsers);
     }
 
     public Observable<Boolean> connectUser(User user) {
-        return Observable
-                .<Boolean>create(s -> {
-                    connectedUsers.add(user);
-                    s.onNext(Boolean.TRUE);
-                    s.onCompleted();
-                })
-                .doOnNext(v -> System.out.println(user.nickname + " connected"));
+        return Observable.<Boolean>create(s -> {
+            connectedUsers.add(user);
+            s.onNext(Boolean.TRUE);
+            s.onCompleted();
+        })
+        .doOnNext(b -> System.out.println(user.nickname + " connected"));
     }
 
     public Observable<Boolean> disconnectUser(User user) {
-        return Observable
-                .<Boolean>create(s -> {
-                    connectedUsers.remove(user);
-                    s.onNext(Boolean.TRUE);
-                    s.onCompleted();
-                })
-                .doOnNext(v -> System.out.println(user.nickname + " disconnected"));
+        return Observable.<Boolean>create(s -> {
+            connectedUsers.remove(user);
+            s.onNext(Boolean.TRUE);
+            s.onCompleted();
+        })
+        .doOnNext(b -> System.out.println(user.nickname + " disconnected"));
     }
 }
