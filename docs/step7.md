@@ -1,5 +1,5 @@
 # Step 007 - Live & Let Die (and Retry)
-Start from branch `step6`, solution is in branch `step7`.
+Start from branch `solution/step6`, solution is in branch `solution/step7`.
 
 ## The Problem
 `StatService.lastBlockFoundBy` has an intermittent bug that causes it to crash with an `IndexOutOfBoundsException`.

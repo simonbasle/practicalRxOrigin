@@ -41,4 +41,4 @@ Controllers are unit tested (see `/src/test/java`) and attendees are encouraged 
 
 Each step is described in the ad hoc `stepX.md` document under `/docs`.
 
-One can **catch up if late or peek at the solution of each step** in its associated branch (eg. branch `step2` contains the solution to step #2 described in `/docs/steps2.md`).
+One can **catch up if late or peek at the solution of each step** in its associated branch (eg. branch `solution/step2` contains the solution to step #2 described in `/docs/steps2.md` and can be used as a starting point for step #3).
