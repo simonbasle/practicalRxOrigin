@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.query.QueryResult;
-import com.couchbase.client.java.query.QueryRow;
+import com.couchbase.client.java.query.N1qlQueryResult;
+import com.couchbase.client.java.query.N1qlQueryRow;
 import com.couchbase.client.java.query.Select;
 import com.couchbase.client.java.query.Statement;
 import org.dogepool.practicalrx.domain.User;
@@ -58,9 +58,9 @@ public class UserService {
             try {
                 Statement statement = Select.select("avatarId", "bio", "displayName", "id", "nickname").from(x("default"))
                                             .where(x("type").eq(s("user"))).groupBy(x("displayName"));
-                QueryResult queryResult = couchbaseBucket.query(statement);
+                N1qlQueryResult queryResult = couchbaseBucket.query(statement);
                 List<User> users = new ArrayList<User>();
-                for (QueryRow qr : queryResult) {
+                for (N1qlQueryRow qr : queryResult) {
                     users.add(User.fromJsonObject(qr.value()));
                 }
                 return users;
