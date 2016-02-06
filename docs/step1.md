@@ -1,5 +1,5 @@
 # Step 1 - Simple Creation
-Start from branch `master`, solution is in branch `step1`. You can look at the history
+Start from branch `master`, solution is in branch `solution/step1`. You can look at the history
 of the solution to see changes in the services and implied modifications separately.
 
 

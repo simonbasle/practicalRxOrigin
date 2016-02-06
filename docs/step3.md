@@ -1,5 +1,5 @@
 # Step 3 - Filter
-Start from branch `step2`, solution is in branch `step3`.
+Start from branch `solution/step2`, solution is in branch `solution/step3`.
 
 ## Migrate Services
  - UserService

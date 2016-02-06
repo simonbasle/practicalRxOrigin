@@ -1,5 +1,5 @@
 # Step 6 - Combine
-Start from branch `step5`, solution is in branch `step6`.
+Start from branch `solution/step5`, solution is in branch `solution/step6`.
 
 ## Operators (by difficulty)
 Simple: `concat`

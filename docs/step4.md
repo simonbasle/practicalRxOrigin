@@ -1,5 +1,5 @@
 # Step 4 - Count
-Start from branch `step3`, solution is in branch `step4`.
+Start from branch `solution/step3`, solution is in branch `solution/step4`.
 
 ## Migrate Services
  - RankingService

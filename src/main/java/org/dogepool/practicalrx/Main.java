@@ -1,5 +1,6 @@
 package org.dogepool.practicalrx;
 
+import java.io.File;
 import java.util.List;
 
 import com.couchbase.client.java.Bucket;
@@ -23,7 +24,24 @@ import org.springframework.core.annotation.Order;
 public class Main {
 
     public static void main(String[] args) {
+        checkConfig();
         ConfigurableApplicationContext ctx = SpringApplication.run(Main.class, args);
+    }
+
+    private static void checkConfig() {
+        File mainConfig = new File("src/main/resources/application.properties");
+        File testConfig = new File("src/test/resources/application.properties");
+
+        System.out.println(mainConfig.isFile() + " " + testConfig.isFile());
+
+        if (!mainConfig.isFile() || !testConfig.isFile()) {
+            throw new IllegalStateException("\n\n========PLEASE CONFIGURE PROJECT========" +
+                    "\nApplication configuration not found, have you:" +
+                    "\n\t - copied \"application.main\" to \"src/main/resources/application.properties\"?" +
+                    "\n\t - copied \"application.test\" to \"src/test/resources/application.properties\"?" +
+                    "\n\t - edited these files with the correct configuration?" +
+                    "\n========================================\n");
+        }
     }
 
     @Bean

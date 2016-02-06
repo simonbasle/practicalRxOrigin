@@ -1,5 +1,5 @@
 # Step 8 - Chain
-Start from branch `step7`, solution is in branch `step8`.
+Start from branch `solution/step7`, solution is in branch `solution/step8`.
 
 ## Migrate Services
  - ExchangeRateService

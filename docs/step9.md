@@ -1,5 +1,5 @@
 # Step 9 - Clean-up Controllers
-Start from branch `step9pre`, solution is in branch `step9`.
+Start from branch `solution/step9pre`, solution is in branch `solution/step9`.
 
 The starting branch changes the tests to account for the code migrating to a fully asynchronous one.
 
